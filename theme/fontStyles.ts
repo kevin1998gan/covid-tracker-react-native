@@ -52,5 +52,5 @@ export const fontStyles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 16,
     color: colors.secondary,
-  }
+  },
 });

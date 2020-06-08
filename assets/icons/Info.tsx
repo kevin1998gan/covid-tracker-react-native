@@ -1,20 +1,20 @@
 import React from 'react';
 import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
-
 import Svg, { Path } from 'react-native-svg';
+
 import { colors } from '@theme';
 
 type CheckProps = {
   width?: number | string;
   height?: number | string;
   color?: string;
-  style?: StyleProp<ViewStyle>
+  style?: StyleProp<ViewStyle>;
 };
 
 const Info: React.FC<CheckProps> = ({ width = 12, height = 12, color = colors.tertiary, style }) => {
   return (
     <View style={style}>
-      <Svg width={width} height={height} fill="none" viewBox={`0 0 12 12`}>
+      <Svg width={width} height={height} fill="none" viewBox="0 0 12 12">
         <Path
           fill={color}
           fillRule="evenodd"

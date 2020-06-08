@@ -4,6 +4,7 @@ import React from 'react';
 import { KeyboardTypeOptions, StyleSheet } from 'react-native';
 
 import Info from '../../assets/icons/Info';
+
 import { FieldWrapper } from './Screen';
 import { LabelText } from './Text';
 import { ValidatedTextInput } from './ValidatedTextInput';

@@ -13,9 +13,9 @@ import UserService from '@covid/core/user/UserService';
 import i18n from '@covid/locale/i18n';
 import AssessmentCoordinator from '@covid/features/assessment/AssessmentCoordinator';
 import { assessmentService } from '@covid/Services';
+import { colors } from '@theme';
 
 import { ScreenParamList } from '../ScreenParamList';
-import { colors } from '@theme';
 
 const initialFormValues = {
   description: '',

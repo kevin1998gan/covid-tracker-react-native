@@ -8,7 +8,7 @@ type CheckProps = {
 
 const Error: React.FC<CheckProps> = ({ width = 24, height = 24 }) => {
   return (
-    <Svg width={width} height={height} fill="none" viewBox={`0 0 24 24`}>
+    <Svg width={width} height={height} fill="none" viewBox="0 0 24 24">
       <Circle cx="12" cy="12" r="12" fill="#FA7268" />
       <Path
         stroke="white"
