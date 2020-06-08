@@ -1,13 +1,18 @@
-import { CheckboxItem, CheckboxList } from '@covid/components/Checkbox';
-import { BrandedButton, ClickableText, RegularBoldText, RegularText } from '@covid/components/Text';
-import Analytics, { events } from '@covid/core/Analytics';
-import UserService from '@covid/core/user/UserService';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { colors } from '@theme';
 import React, { Component } from 'react';
-import { Linking, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, Linking, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+import { chevronLeft } from '@assets';
+import { colors } from '@theme';
+import { CheckboxItem, CheckboxList } from '@covid/components/Checkbox';
+import { Header } from '@covid/components/Screen';
+import { BrandedButton, ClickableText, HeaderText, RegularBoldText, RegularText } from '@covid/components/Text';
+import Analytics, { events } from '@covid/core/Analytics';
+import UserService from '@covid/core/user/UserService';
+import AssessmentCoordinator from '@covid/features/assessment/AssessmentCoordinator';
+import i18n from '@covid/locale/i18n';
 
 import Navigator from '../../Navigation';
 import { ScreenParamList } from '../../ScreenParamList';
@@ -21,6 +26,7 @@ interface TermsState {
   agreeToAbove: boolean;
   anonymizedData: boolean;
   reContacted: boolean;
+  submitting: boolean;
 }
 
 export default class ValidationStudyConsentScreen extends Component<PropsType, TermsState> {
@@ -32,6 +38,7 @@ export default class ValidationStudyConsentScreen extends Component<PropsType, T
       agreeToAbove: false,
       anonymizedData: false,
       reContacted: false,
+      submitting: false,
     };
   }
 
@@ -47,8 +54,9 @@ export default class ValidationStudyConsentScreen extends Component<PropsType, T
     this.setState({ reContacted: !this.state.reContacted });
   };
 
-  handleAgreeClicked = async () => {
-    if (this.state.agreeToAbove) {
+  handleAgreeClicked = () => {
+    if (this.state.agreeToAbove && !this.state.submitting) {
+      this.setState({ submitting: true });
       Analytics.track(events.JOIN_STUDY);
       this.userService.setValidationStudyResponse(true, this.state.anonymizedData, this.state.reContacted);
       Navigator.resetToProfileStartAssessment(this.props.route.params.currentPatient);
@@ -60,6 +68,16 @@ export default class ValidationStudyConsentScreen extends Component<PropsType, T
       <View style={{ flex: 1, backgroundColor: colors.white }}>
         <SafeAreaView style={styles.mainContainer}>
           <ScrollView>
+            <TouchableOpacity style={styles.backIcon} onPress={this.props.navigation.goBack}>
+              <Image source={chevronLeft} />
+            </TouchableOpacity>
+
+            <Header>
+              <HeaderText style={styles.header}>Study Consent</HeaderText>
+            </Header>
+
+            <View style={{ borderWidth: 0.5, borderColor: colors.primary, marginBottom: 64 }} />
+
             <RegularBoldText>INFORMATION SHEET FOR PARTICIPANTS{'\n'}</RegularBoldText>
 
             <RegularText>Ethical Clearance Reference Number: LRS-19/20-18856{'\n'}</RegularText>
@@ -325,7 +343,7 @@ export default class ValidationStudyConsentScreen extends Component<PropsType, T
               hideLoading
               enable={this.state.agreeToAbove}
               onPress={this.handleAgreeClicked}>
-              Take part
+              {this.state.agreeToAbove ? 'Take part' : 'Scroll down to give consent'}
             </BrandedButton>
           )}
         </SafeAreaView>
@@ -345,8 +363,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.backgroundPrimary,
     marginHorizontal: 24,
   },
-
+  backIcon: {
+    alignSelf: 'flex-start',
+    marginTop: 32,
+  },
+  header: {
+    marginVertical: 24,
+    textAlign: 'center',
+  },
   button: {
-    marginTop: 20,
+    marginVertical: 20,
   },
 });

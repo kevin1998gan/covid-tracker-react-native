@@ -1,14 +1,15 @@
-import { userService } from '@covid/Services';
+import { FormikProps } from 'formik';
+import { Item, Label } from 'native-base';
+import React, { Component } from 'react';
+import { StyleSheet, View } from 'react-native';
+
 import DropdownField from '@covid/components/DropdownField';
 import { FieldWrapper } from '@covid/components/Screen';
 import { ValidatedTextInput } from '@covid/components/ValidatedTextInput';
 import { ValidationError } from '@covid/components/ValidationError';
 import { isUSCountry } from '@covid/core/user/UserService';
 import i18n from '@covid/locale/i18n';
-import { FormikProps } from 'formik';
-import { Item, Label } from 'native-base';
-import React, { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { userService } from '@covid/Services';
 
 export interface WeightData {
   weight: string;
@@ -106,10 +107,10 @@ export class WeightQuestion extends Component<Props, object> {
             </View>
           )}
         </Item>
-        {props.errors.weight && <ValidationError error={props.errors.weight} />}
-        {props.errors.pounds && <ValidationError error={props.errors.pounds} />}
-        {props.errors.stones && <ValidationError error={props.errors.stones} />}
-        {props.errors.weightUnit && <ValidationError error={props.errors.weightUnit} />}
+        {props.touched.weight && props.errors.weight && <ValidationError error={props.errors.weight} />}
+        {props.touched.pounds && props.errors.pounds && <ValidationError error={props.errors.pounds} />}
+        {props.touched.stones && props.errors.stones && <ValidationError error={props.errors.stones} />}
+        {props.touched.weightUnit && props.errors.weightUnit && <ValidationError error={props.errors.weightUnit} />}
       </FieldWrapper>
     );
   }

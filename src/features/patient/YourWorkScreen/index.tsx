@@ -21,6 +21,7 @@ import {
   PatientInteractions,
 } from '@covid/core/user/dto/UserAPIContracts';
 import i18n from '@covid/locale/i18n';
+
 import { initialState, IOption, State, YourWorkData, YourWorkProps } from './helpers';
 
 export default class YourWorkScreen extends Component<YourWorkProps, State> {
@@ -381,7 +382,7 @@ export default class YourWorkScreen extends Component<YourWorkProps, State> {
                   )}
 
                   <ErrorText>{this.state.errorMessage}</ErrorText>
-                  {!!Object.keys(errors).length && <ValidationErrors errors={errors} />}
+                  {!!Object.keys(errors).length && props.submitCount > 0 && <ValidationErrors errors={errors} />}
 
                   <BrandedButton
                     onPress={handleSubmit}

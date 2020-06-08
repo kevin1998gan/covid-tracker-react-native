@@ -1,10 +1,3 @@
-import ProgressStatus from '@covid/components/ProgressStatus';
-import Screen, { Header, ProgressBlock } from '@covid/components/Screen';
-import { BrandedButton, ErrorText, HeaderText } from '@covid/components/Text';
-import { ValidationErrors } from '@covid/components/ValidationError';
-import UserService, { isUSCountry } from '@covid/core/user/UserService';
-import { PatientInfosRequest } from '@covid/core/user/dto/UserAPIContracts';
-import i18n from '@covid/locale/i18n';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Formik, FormikProps } from 'formik';
@@ -12,7 +5,16 @@ import { Form, Text } from 'native-base';
 import React, { Component } from 'react';
 import * as Yup from 'yup';
 
-import Navigator from '../Navigation';
+import ProgressStatus from '@covid/components/ProgressStatus';
+import Screen, { Header, ProgressBlock } from '@covid/components/Screen';
+import { BrandedButton, ErrorText, HeaderText } from '@covid/components/Text';
+import { ValidationErrors } from '@covid/components/ValidationError';
+import UserService, { isUSCountry } from '@covid/core/user/UserService';
+import { PatientInfosRequest } from '@covid/core/user/dto/UserAPIContracts';
+import AssessmentCoordinator from '@covid/features/assessment/AssessmentCoordinator';
+import { AtopyData, AtopyQuestions } from '@covid/features/patient/fields/AtopyQuestions';
+import i18n from '@covid/locale/i18n';
+
 import { ScreenParamList } from '../ScreenParamList';
 import { BloodPressureData, BloodPressureMedicationQuestion } from '../patient/fields/BloodPressureMedicationQuestion';
 import {
@@ -34,7 +36,8 @@ interface BackfillData
     RaceEthnicityData,
     PeriodData,
     HormoneTreatmentData,
-    VitaminSupplementData {}
+    VitaminSupplementData,
+    AtopyData {}
 
 type BackDateProps = {
   navigation: StackNavigationProp<ScreenParamList, 'ProfileBackDate'>;
@@ -48,6 +51,7 @@ type State = {
   needPeriodStatusAnswer: boolean;
   needHormoneTreatmentAnswer: boolean;
   needVitaminAnswer: boolean;
+  needAtopyAnswers: boolean;
 };
 
 const initialState: State = {
@@ -57,6 +61,7 @@ const initialState: State = {
   needPeriodStatusAnswer: false,
   needHormoneTreatmentAnswer: false,
   needVitaminAnswer: false,
+  needAtopyAnswers: false,
 };
 
 export default class ProfileBackDateScreen extends Component<BackDateProps, State> {
@@ -123,7 +128,7 @@ export default class ProfileBackDateScreen extends Component<BackDateProps, Stat
     }),
     vitaminSupplements: Yup.array<string>().when([], {
       is: () => this.state.needVitaminAnswer,
-      then: Yup.array<string>().min(1),
+      then: Yup.array<string>().min(1, i18n.t('your-health.vitamins.please-select-vitamins')),
     }),
     vitaminOther: Yup.string().when('vitaminSupplements', {
       is: (val: string[]) => val.includes(supplementValues.OTHER),
@@ -134,7 +139,7 @@ export default class ProfileBackDateScreen extends Component<BackDateProps, Stat
   async componentDidMount() {
     const userService = new UserService();
     const features = userService.getConfig();
-    const currentPatient = this.props.route.params.currentPatient;
+    const { currentPatient } = AssessmentCoordinator.assessmentData;
     this.setState({
       needBloodPressureAnswer: !currentPatient.hasBloodPressureAnswer,
       needRaceEthnicityAnswer:
@@ -142,11 +147,12 @@ export default class ProfileBackDateScreen extends Component<BackDateProps, Stat
       needPeriodStatusAnswer: !currentPatient.hasPeriodAnswer,
       needHormoneTreatmentAnswer: !currentPatient.hasHormoneTreatmentAnswer,
       needVitaminAnswer: !currentPatient.hasVitaminAnswer,
+      needAtopyAnswers: !currentPatient.hasAtopyAnswers,
     });
   }
 
   handleProfileUpdate(formData: BackfillData) {
-    const { currentPatient } = this.props.route.params;
+    const { currentPatient } = AssessmentCoordinator.assessmentData;
     const patientId = currentPatient.patientId;
 
     const userService = new UserService();
@@ -160,7 +166,9 @@ export default class ProfileBackDateScreen extends Component<BackDateProps, Stat
         if (formData.havingPeriods) currentPatient.hasPeriodAnswer = true;
         if (formData.hormoneTreatment?.length) currentPatient.hasHormoneTreatmentAnswer = true;
         if (formData.vitaminSupplements?.length) currentPatient.hasVitaminAnswer = true;
-        Navigator.startAssessment(currentPatient);
+        if (formData.hasHayfever) currentPatient.hasAtopyAnswers = true;
+        if (formData.hasHayfever == 'yes') currentPatient.hasHayfever = true;
+        AssessmentCoordinator.gotoNextScreen(this.props.route.name);
       })
       .catch((err) => {
         this.setState({ errorMessage: i18n.t('something-went-wrong') });
@@ -237,11 +245,21 @@ export default class ProfileBackDateScreen extends Component<BackDateProps, Stat
       };
     }
 
+    if (this.state.needAtopyAnswers) {
+      infos = {
+        ...infos,
+        has_hayfever: formData.hasHayfever === 'yes',
+        has_eczema: formData.hasEczema === 'yes',
+        has_asthma: formData.hasAsthma === 'yes',
+        has_lung_disease_only: formData.hasLungDisease === 'yes',
+      };
+    }
+
     return infos;
   }
 
   render() {
-    const currentPatient = this.props.route.params.currentPatient;
+    const currentPatient = AssessmentCoordinator.assessmentData.currentPatient;
 
     return (
       <Screen profile={currentPatient.profile} navigation={this.props.navigation}>
@@ -260,6 +278,7 @@ export default class ProfileBackDateScreen extends Component<BackDateProps, Stat
             ...HormoneTreatmentQuestion.initialFormValues(),
             ...PeriodQuestion.initialFormValues(),
             ...VitaminSupplementsQuestion.initialFormValues(),
+            ...AtopyQuestions.initialFormValues(),
           }}
           validationSchema={this.registerSchema}
           onSubmit={(values: BackfillData) => {
@@ -290,8 +309,12 @@ export default class ProfileBackDateScreen extends Component<BackDateProps, Stat
                   <VitaminSupplementsQuestion formikProps={props as FormikProps<VitaminSupplementData>} />
                 )}
 
+                {this.state.needAtopyAnswers && <AtopyQuestions formikProps={props as FormikProps<AtopyData>} />}
+
                 <ErrorText>{this.state.errorMessage}</ErrorText>
-                {!!Object.keys(props.errors).length && <ValidationErrors errors={props.errors as string[]} />}
+                {!!Object.keys(props.errors).length && props.submitCount > 0 && (
+                  <ValidationErrors errors={props.errors as string[]} />
+                )}
 
                 <BrandedButton onPress={props.handleSubmit}>
                   <Text>{i18n.t('update-profile')}</Text>

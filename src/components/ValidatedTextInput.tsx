@@ -1,5 +1,6 @@
 import Error from '@assets/icons/Error';
 import { colors } from '@theme';
+import { Icon } from 'native-base';
 import React, { Component } from 'react';
 import { StyleSheet, TextInput, TextInputProps, View } from 'react-native';
 

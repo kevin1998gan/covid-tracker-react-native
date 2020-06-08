@@ -1,3 +1,12 @@
+import { RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { Formik } from 'formik';
+import { cloneDeep } from 'lodash';
+import { Form, Item, Label } from 'native-base';
+import React, { Component } from 'react';
+import { StyleSheet } from 'react-native';
+import * as Yup from 'yup';
+
 import { CheckboxItem, CheckboxList } from '@covid/components/Checkbox';
 import { GenericTextField } from '@covid/components/GenericTextField';
 import ProgressStatus from '@covid/components/ProgressStatus';
@@ -7,14 +16,6 @@ import { ValidationErrors } from '@covid/components/ValidationError';
 import UserService, { isGBCountry, isUSCountry } from '@covid/core/user/UserService';
 import { PatientInfosRequest } from '@covid/core/user/dto/UserAPIContracts';
 import i18n from '@covid/locale/i18n';
-import { RouteProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { Formik } from 'formik';
-import { cloneDeep } from 'lodash';
-import { Form, Item, Label } from 'native-base';
-import React, { Component } from 'react';
-import { StyleSheet } from 'react-native';
-import * as Yup from 'yup';
 
 import { ScreenParamList } from '../ScreenParamList';
 
@@ -329,7 +330,9 @@ export default class YourStudyScreen extends Component<YourStudyProps, State> {
                 )}
 
                 <ErrorText>{this.state.errorMessage}</ErrorText>
-                {!!Object.keys(props.errors).length && <ValidationErrors errors={props.errors} />}
+                {!!Object.keys(props.errors).length && props.submitCount > 0 && (
+                  <ValidationErrors errors={props.errors} />
+                )}
 
                 <BrandedButton onPress={props.handleSubmit}>{i18n.t('next-question')}</BrandedButton>
               </Form>

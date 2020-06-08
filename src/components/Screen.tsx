@@ -13,10 +13,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { colors } from '@theme';
-import { PatientProfile } from '@covid/core/patient/PatientState';
 import { ScreenParamList } from '@covid/features/ScreenParamList';
-import PatientHeader from './PatientHeader';
+import { PatientProfile } from '@covid/core/patient/PatientState';
 import Analytics from '@covid/core/Analytics';
+
+import PatientHeader from './PatientHeader';
 
 export const screenWidth = Math.round(Dimensions.get('window').width) - 32;
 export const screenHeight = Math.round(Dimensions.get('window').height);

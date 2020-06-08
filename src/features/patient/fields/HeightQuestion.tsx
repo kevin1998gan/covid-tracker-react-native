@@ -1,14 +1,15 @@
-import { userService } from '@covid/Services';
+import { FormikProps } from 'formik';
+import { Item, Label } from 'native-base';
+import React, { Component } from 'react';
+import { StyleSheet, View } from 'react-native';
+
 import DropdownField from '@covid/components/DropdownField';
 import { FieldWrapper } from '@covid/components/Screen';
 import { ValidatedTextInput } from '@covid/components/ValidatedTextInput';
 import { ValidationError } from '@covid/components/ValidationError';
 import { isUSCountry } from '@covid/core/user/UserService';
 import i18n from '@covid/locale/i18n';
-import { FormikProps } from 'formik';
-import { Item, Label } from 'native-base';
-import React, { Component } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { userService } from '@covid/Services';
 
 export interface HeightData {
   height: string;
@@ -122,10 +123,10 @@ export class HeightQuestion extends Component<Props, object> {
             </View>
           )}
         </Item>
-        {props.errors.height && <ValidationError error={props.errors.height} />}
-        {props.errors.feet && <ValidationError error={props.errors.feet} />}
-        {props.errors.inches && <ValidationError error={props.errors.inches} />}
-        {props.errors.heightUnit && <ValidationError error={props.errors.heightUnit} />}
+        {props.touched.height && props.errors.height && <ValidationError error={props.errors.height} />}
+        {props.touched.feet && props.errors.feet && <ValidationError error={props.errors.feet} />}
+        {props.touched.inches && props.errors.inches && <ValidationError error={props.errors.inches} />}
+        {props.touched.heightUnit && props.errors.heightUnit && <ValidationError error={props.errors.heightUnit} />}
       </FieldWrapper>
     );
   }

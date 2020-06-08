@@ -4,8 +4,9 @@ import React, { Component } from 'react';
 import { Linking, Modal, Platform, StyleSheet, TouchableOpacity } from 'react-native';
 
 import { colors } from '@theme';
-import UserService, { isGBCountry, isUSCountry, isSECountry } from '@covid/core/user/UserService';
 import i18n from '@covid/locale/i18n';
+import UserService, { isGBCountry, isUSCountry, isSECountry } from '@covid/core/user/UserService';
+
 import { RegularBoldText, RegularText } from './Text';
 
 type PropsType = object;
@@ -28,7 +29,7 @@ const ModalContainer = (props: any) => (
   </Modal>
 );
 
-export async function shouldAskForRating() {
+export async function shouldAskForRating(): Promise<boolean> {
   const userService = new UserService();
   const profile = await userService.getProfile();
   const eligibleToAskForRating = profile.ask_for_rating;

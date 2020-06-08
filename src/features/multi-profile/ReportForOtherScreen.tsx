@@ -6,7 +6,9 @@ import { Image, SafeAreaView, ScrollView, StyleSheet, View } from 'react-native'
 
 import { profilesIcon } from '@assets';
 import { colors } from '@theme';
-import { Header } from '@covid/components/Screen';
+import i18n from '@covid/locale/i18n';
+import { AssessmentCoordinator } from '@covid/features/assessment/AssessmentCoordinator';
+import UserService from '@covid/core/user/UserService';
 import {
   BrandedButton,
   ClickableText,
@@ -15,8 +17,8 @@ import {
   RegularText,
   SecondaryText,
 } from '@covid/components/Text';
-import UserService from '@covid/core/user/UserService';
-import i18n from '@covid/locale/i18n';
+import { Header } from '@covid/components/Screen';
+
 import Navigator from '../Navigation';
 import { ScreenParamList } from '../ScreenParamList';
 
@@ -29,7 +31,7 @@ export default class ReportForOtherScreen extends Component<RenderProps, object>
   handleSkip = async () => {
     const userService = new UserService();
     await userService.recordAskedToReportForOther();
-    this.props.navigation.navigate(Navigator.getThankYouScreenName());
+    this.props.navigation.navigate(AssessmentCoordinator.getThankYouScreen());
   };
 
   render() {

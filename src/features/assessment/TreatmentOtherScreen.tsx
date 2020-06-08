@@ -3,7 +3,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Formik } from 'formik';
 import { Form, Item, Label, Text, Textarea } from 'native-base';
 import React, { Component } from 'react';
-import { Platform, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import * as Yup from 'yup';
 
 import ProgressStatus from '@covid/components/ProgressStatus';
@@ -11,7 +11,9 @@ import Screen, { FieldWrapper, Header, ProgressBlock } from '@covid/components/S
 import { BrandedButton, HeaderText, LabelText } from '@covid/components/Text';
 import UserService from '@covid/core/user/UserService';
 import i18n from '@covid/locale/i18n';
-import Navigator from '../Navigation';
+import AssessmentCoordinator from '@covid/features/assessment/AssessmentCoordinator';
+import { assessmentService } from '@covid/Services';
+
 import { ScreenParamList } from '../ScreenParamList';
 import { colors } from '@theme';
 
@@ -35,7 +37,7 @@ type State = {
 export default class TreatmentOtherScreen extends Component<TreatmentOtherProps, State> {
   constructor(props: TreatmentOtherProps) {
     super(props);
-    Navigator.resetNavigation(props.navigation);
+    AssessmentCoordinator.resetNavigation(props.navigation);
     this.handleUpdateTreatment = this.handleUpdateTreatment.bind(this);
     this.focus = this.focus.bind(this);
     this.blur = this.blur.bind(this);
@@ -54,28 +56,28 @@ export default class TreatmentOtherScreen extends Component<TreatmentOtherProps,
     this.setState({ isFocused: false });
   }
 
-  handleUpdateTreatment(formData: TreatmentData) {
-    const { currentPatient, assessmentId, location } = this.props.route.params;
-    if (!formData.description) {
-      Navigator.gotoEndAssessment();
-    } else {
-      const userService = new UserService();
-      userService
-        .updateAssessment(assessmentId, {
-          treatment: formData.description,
-        })
-        .then((r) => Navigator.gotoEndAssessment());
+  handleUpdateTreatment = async (formData: TreatmentData) => {
+    const { assessmentId } = AssessmentCoordinator.assessmentData;
+    let assessment;
+
+    if (formData.description) {
+      assessment = {
+        treatment: formData.description,
+      };
     }
-  }
+
+    await assessmentService.completeAssessment(assessmentId!, assessment);
+    AssessmentCoordinator.gotoNextScreen(this.props.route.name);
+  };
 
   render() {
-    const currentPatient = this.props.route.params.currentPatient;
+    const currentPatient = AssessmentCoordinator.assessmentData.currentPatient;
     const title =
-      this.props.route.params.location == 'back_from_hospital'
+      this.props.route.params.location === 'back_from_hospital'
         ? i18n.t('treatment-other-title-after')
         : i18n.t('treatment-other-title-during');
     const question =
-      this.props.route.params.location == 'back_from_hospital'
+      this.props.route.params.location === 'back_from_hospital'
         ? i18n.t('treatment-other-question-treatment-after')
         : i18n.t('treatment-other-question-treatment-during');
 
