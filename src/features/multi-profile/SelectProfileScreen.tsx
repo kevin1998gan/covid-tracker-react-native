@@ -1,31 +1,30 @@
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { RouteProp } from '@react-navigation/native';
-import { Card } from 'native-base';
 import React, { Component } from 'react';
-import { Image, SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
-import key from 'weak-key';
+import { SafeAreaView, ScrollView, StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import { addProfile, menuIcon, NUMBER_OF_PROFILE_AVATARS, tick } from '@assets';
+import { NUMBER_OF_PROFILE_AVATARS } from '@assets';
 import { colors } from '@theme';
-import DaysAgo from '@covid/components/DaysAgo';
 import { Loading, LoadingModal } from '@covid/components/Loading';
 import { Header } from '@covid/components/Screen';
-import { ClippedText, HeaderText, RegularText, SecondaryText } from '@covid/components/Text';
+import { HeaderText, SecondaryText } from '@covid/components/Text';
 import { ApiErrorState, initialErrorState } from '@covid/core/api/ApiServiceErrors';
 import i18n from '@covid/locale/i18n';
-import { AvatarName, getAvatarByName } from '@covid/utils/avatar';
-import { getDaysAgo } from '@covid/utils/datetime';
 import { offlineService, userService } from '@covid/Services';
+import { DrawerToggle } from '@covid/components/DrawerToggle';
+import { ProfileCard } from '@covid/components/ProfileCard';
+import { NewProfileCard } from '@covid/components/NewProfileCard';
+import { DEFAULT_PROFILE } from '@covid/utils/avatar';
 
-import Navigator from '../Navigation';
 import { ScreenParamList } from '../ScreenParamList';
+import Navigator from '../Navigation';
 
 type RenderProps = {
   navigation: DrawerNavigationProp<ScreenParamList, 'SelectProfile'>;
   route: RouteProp<ScreenParamList, 'SelectProfile'>;
 };
 
-type Patient = {
+export type Profile = {
   id: string;
   name?: string;
   avatar_name?: string;
@@ -35,17 +34,17 @@ type Patient = {
   created_at?: Date;
 };
 
-type PatientListState = {
+type ProfileListState = {
   isLoaded: boolean;
-  patients: Patient[];
+  profiles: Profile[];
   shouldRefresh: boolean;
 };
 
-type State = PatientListState & ApiErrorState;
+type State = ProfileListState & ApiErrorState;
 
 const initialState = {
   ...initialErrorState,
-  patients: [],
+  profiles: [],
   isLoaded: false,
   shouldRefresh: false,
 };
@@ -78,7 +77,7 @@ export default class SelectProfileScreen extends Component<RenderProps, State> {
       const response = await userService.listPatients();
       response &&
         this.setState({
-          patients: response.data,
+          profiles: response.data,
           isLoaded: true,
         });
     } catch (error) {
@@ -86,11 +85,11 @@ export default class SelectProfileScreen extends Component<RenderProps, State> {
     }
   }
 
-  async profileSelected(patientId: string, index: number) {
+  async profileSelected(profileId: string, index: number) {
     try {
-      const currentPatient = await userService.getCurrentPatient(patientId);
+      const currentPatient = await userService.getCurrentPatient(profileId);
       this.setState({ isApiError: false });
-      await Navigator.profileSelected(index == 0, currentPatient);
+      await Navigator.profileSelected(index === 0, currentPatient);
     } catch (error) {
       this.setState({
         isApiError: true,
@@ -102,7 +101,7 @@ export default class SelectProfileScreen extends Component<RenderProps, State> {
           });
           setTimeout(() => {
             this.setState({ status: i18n.t('errors.status-loading') });
-            this.profileSelected(patientId, index);
+            this.profileSelected(profileId, index);
           }, offlineService.getRetryDelay());
         },
       });
@@ -110,11 +109,11 @@ export default class SelectProfileScreen extends Component<RenderProps, State> {
   }
 
   getNextAvatarName() {
-    if (this.state.patients) {
-      const n = (this.state.patients.length + 1) % NUMBER_OF_PROFILE_AVATARS;
+    if (this.state.profiles) {
+      const n = (this.state.profiles.length + 1) % NUMBER_OF_PROFILE_AVATARS;
       return 'profile' + n.toString();
     } else {
-      return 'profile1';
+      return DEFAULT_PROFILE;
     }
   }
 
@@ -136,12 +135,7 @@ export default class SelectProfileScreen extends Component<RenderProps, State> {
           )}
           <ScrollView contentContainerStyle={styles.scrollView}>
             <View style={styles.rootContainer}>
-              <TouchableOpacity
-                onPress={() => {
-                  this.props.navigation.toggleDrawer();
-                }}>
-                <Image source={menuIcon} style={styles.menuIcon} />
-              </TouchableOpacity>
+              <DrawerToggle navigation={this.props.navigation} style={{ tintColor: colors.primary }} />
 
               <Header style={styles.headerContainer}>
                 <HeaderText style={{ marginBottom: 12 }}>{i18n.t('select-profile-title')}</HeaderText>
@@ -150,34 +144,18 @@ export default class SelectProfileScreen extends Component<RenderProps, State> {
 
               {this.state.isLoaded ? (
                 <View style={styles.profileList}>
-                  {this.state.patients.map((patient, i) => {
-                    const avatarImage = getAvatarByName((patient.avatar_name ?? 'profile1') as AvatarName);
-                    const hasReportedToday = patient.last_reported_at && getDaysAgo(patient.last_reported_at) === 0;
+                  {this.state.profiles.map((profile, i) => {
                     return (
-                      <View style={styles.cardContainer} key={key(patient)}>
-                        <TouchableOpacity onPress={() => this.profileSelected(patient.id, i)}>
-                          <Card style={styles.card}>
-                            <View style={styles.avatarContainer}>
-                              {hasReportedToday && (
-                                <View style={styles.circle}>
-                                  <Image source={tick} style={styles.tick} />
-                                </View>
-                              )}
-                              <Image source={avatarImage} style={styles.avatar} resizeMode="contain" />
-                            </View>
-                            <ClippedText>{patient.name}</ClippedText>
-                            <DaysAgo timeAgo={patient.last_reported_at} />
-                          </Card>
+                      <View style={styles.cardContainer} key={profile.id}>
+                        <TouchableOpacity onPress={() => this.profileSelected(profile.id, i)}>
+                          <ProfileCard profile={profile} index={i} />
                         </TouchableOpacity>
                       </View>
                     );
                   })}
 
                   <TouchableOpacity style={styles.cardContainer} key="new" onPress={() => this.gotoCreateProfile()}>
-                    <Card style={styles.card}>
-                      <Image source={addProfile} style={styles.addImage} resizeMode="contain" />
-                      <RegularText>{i18n.t('select-profile-button')}</RegularText>
-                    </Card>
+                    <NewProfileCard />
                   </TouchableOpacity>
                 </View>
               ) : (
@@ -215,50 +193,6 @@ const styles = StyleSheet.create({
     margin: 5,
   },
 
-  avatarContainer: {
-    alignItems: 'center',
-    width: 100,
-    marginBottom: 10,
-  },
-
-  avatar: {
-    height: 100,
-    width: 100,
-  },
-
-  tick: {
-    height: 30,
-    width: 30,
-  },
-
-  circle: {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1,
-    top: 0,
-    right: -5,
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: 'white',
-  },
-
-  addImage: {
-    width: '100%',
-    height: 100,
-    marginBottom: 10,
-  },
-
-  card: {
-    width: '100%',
-    borderRadius: 16,
-    minHeight: 200,
-    paddingVertical: 20,
-    paddingHorizontal: 12,
-    alignItems: 'center',
-  },
-
   view: {
     backgroundColor: colors.backgroundSecondary,
   },
@@ -269,30 +203,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 
-  content: {
-    justifyContent: 'space-between',
-    marginVertical: 32,
-    marginHorizontal: 18,
-  },
-
   rootContainer: {
     padding: 10,
-  },
-
-  shareContainer: {
-    backgroundColor: colors.white,
-    borderRadius: 10,
-    marginHorizontal: 20,
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-  },
-
-  menuIcon: {
-    height: 20,
-    width: 20,
-    tintColor: colors.primary,
-    alignSelf: 'flex-end',
-    marginRight: 15,
-    marginTop: 10,
   },
 });

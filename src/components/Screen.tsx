@@ -66,6 +66,7 @@ type ScreenProps = {
   children: React.ReactNode;
   navigation?: StackNavigationProp<ScreenParamList>;
   profile?: PatientProfile;
+  simpleCallout?: boolean;
 };
 
 export default class Screen extends Component<ScreenProps> {
@@ -78,7 +79,11 @@ export default class Screen extends Component<ScreenProps> {
     return (
       <SafeAreaView style={styles.screen}>
         {profile ? (
-          <PatientHeader profile={profile} navigation={this.props.navigation} />
+          <PatientHeader
+            profile={profile}
+            navigation={this.props.navigation}
+            simpleCallout={this.props.simpleCallout}
+          />
         ) : (
           <View style={styles.statusBarBlock} />
         )}
