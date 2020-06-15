@@ -3,12 +3,9 @@ import React from 'react';
 import { PickerItemProps, StyleSheet, PickerProps, TouchableOpacity, Text } from 'react-native';
 import ModalDropdown from 'react-native-modal-dropdown';
 
-import Info from '@assets/icons/Info';
 import { colors } from '@theme';
 import i18n from '@covid/locale/i18n';
 
-import { FieldWrapper, screenWidth, isAndroid } from './Screen';
-import { LabelText } from './Text';
 import DropdownIcon from '../../assets/icons/Dropdown';
 
 import { FieldWrapper } from './Screen';
