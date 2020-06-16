@@ -1,7 +1,7 @@
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Formik } from 'formik';
-import { Form, Item, Label, Text } from 'native-base';
+import { Form, Text } from 'native-base';
 import React, { Component } from 'react';
 import { StyleSheet, View } from 'react-native';
 import * as Yup from 'yup';
@@ -10,7 +10,7 @@ import DropdownField from '@covid/components/DropdownField';
 import { GenericTextField } from '@covid/components/GenericTextField';
 import ProgressStatus from '@covid/components/ProgressStatus';
 import Screen, { FieldWrapper, Header, ProgressBlock } from '@covid/components/Screen';
-import { BrandedButton, ErrorText, HeaderText, LabelText } from '@covid/components/Text';
+import { BrandedButton, ErrorText, HeaderText, RegularText } from '@covid/components/Text';
 import { ValidatedTextInput } from '@covid/components/ValidatedTextInput';
 import { ValidationErrors } from '@covid/components/ValidationError';
 import { AssessmentInfosRequest } from '@covid/core/assessment/dto/AssessmentInfosRequest';
@@ -290,8 +290,8 @@ export default class DescribeSymptomsScreen extends Component<SymptomProps, Stat
                   label={i18n.t('describe-symptoms.question-has-chills')}
                 />
 
-                <FieldWrapper>
-                  <LabelText>{i18n.t('describe-symptoms.question-your-temperature')}</LabelText>
+                <FieldWrapper style={styles.fieldWrapper}>
+                  <RegularText>{i18n.t('describe-symptoms.question-your-temperature')}</RegularText>
                   <View style={styles.fieldRow}>
                     <View style={styles.primaryField}>
                       <ValidatedTextInput
@@ -488,6 +488,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
 
+  fieldWrapper: {
+    flex: 1,
+    marginHorizontal: 16,
+  },
+
   textItemStyle: {
     borderColor: 'transparent',
   },
@@ -498,5 +503,6 @@ const styles = StyleSheet.create({
 
   secondaryField: {
     flex: 1,
+    margin: -8,
   },
 });

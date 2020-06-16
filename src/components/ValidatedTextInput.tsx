@@ -2,8 +2,8 @@ import { Icon } from 'native-base';
 import React, { Component } from 'react';
 import { StyleSheet, TextInput, TextInputProps, View } from 'react-native';
 
-import { colors } from '@theme';
 import Error from '@assets/icons/Error';
+import { colors } from '@theme';
 
 interface Props extends TextInputProps {
   error?: any;
@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.backgroundTertiary,
     borderRadius: 8,
     flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
     marginTop: 8,
     borderWidth: 1,

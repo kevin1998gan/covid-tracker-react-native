@@ -1,14 +1,11 @@
 import { FormikProps } from 'formik';
-import { Item, Label, View } from 'native-base';
 import React from 'react';
 import { KeyboardTypeOptions, StyleSheet } from 'react-native';
 
-import Info from '../../assets/icons/Info';
-
 import { FieldWrapper } from './Screen';
-import { LabelText } from './Text';
 import { ValidatedTextInput } from './ValidatedTextInput';
 import { ValidationError } from './ValidationError';
+import { RegularText } from './Text';
 
 interface GenericTextFieldProps {
   formikProps: FormikProps<any>;
@@ -24,8 +21,8 @@ interface GenericTextFieldProps {
 export const GenericTextField = (props: GenericTextFieldProps) => {
   const { formikProps, name, label, placeholder, info, keyboardType, showError, ...inputProps } = props;
   return (
-    <FieldWrapper>
-      {!!label && <LabelText>{label}</LabelText>}
+    <FieldWrapper style={styles.fieldWrapper}>
+      {!!label && <RegularText>{label}</RegularText>}
       <ValidatedTextInput
         placeholder={placeholder ?? ''}
         value={formikProps.values[name]}
@@ -37,12 +34,6 @@ export const GenericTextField = (props: GenericTextFieldProps) => {
         keyboardType={keyboardType}
         {...inputProps}
       />
-      {!!info && (
-        <View style={styles.infoContainer}>
-          <Info style={styles.infoIcon} />
-          <LabelText>{info}</LabelText>
-        </View>
-      )}
       {showError && !!formikProps.touched[name] && !!formikProps.errors[name] && (
         <ValidationError
           // @ts-ignore - need to solve type for ValidationError error prop
@@ -54,8 +45,9 @@ export const GenericTextField = (props: GenericTextFieldProps) => {
 };
 
 const styles = StyleSheet.create({
-  textItemStyle: {
-    borderColor: 'transparent',
+  fieldWrapper: {
+    flex: 1,
+    marginHorizontal: 16,
   },
 
   infoContainer: {
