@@ -16,7 +16,7 @@ import { DrawerMenu } from '@covid/features/DrawerMenu';
 import { ScreenParamList } from '@covid/features/ScreenParamList';
 import { SplashScreen } from '@covid/features/SplashScreen';
 import ThankYouScreen from '@covid/features/ThankYouScreen';
-import ThankYouUKScreen from '@covid/features/ThankYouUKScreen';
+import { ThankYouUKScreen } from '@covid/features/ThankYouUKScreen';
 import ViralThankYouScreen from '@covid/features/ViralThankYouScreen';
 import CovidTestDetailScreen from '@covid/features/assessment/CovidTestDetailScreen';
 import DescribeSymptomsScreen from '@covid/features/assessment/DescribeSymptomsScreen';
