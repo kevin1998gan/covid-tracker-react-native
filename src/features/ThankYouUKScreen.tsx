@@ -1,8 +1,9 @@
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Text } from 'native-base';
-import React, { useState, useEffect } from 'react';
+import React, { FC, useState, useRef, useEffect } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, View } from 'react-native';
+import YoutubePlayer from 'react-native-youtube-iframe';
 
 import { blog004, dataPage003, incidence004, timUpdate002 } from '@assets';
 import { colors } from '@theme';
@@ -12,6 +13,7 @@ import InviteToStudy from '@covid/components/InviteToStudy';
 import { Header } from '@covid/components/Screen';
 import ShareThisApp from '@covid/components/ShareThisApp';
 import { BrandedButton, ClickableText, HeaderText, RegularText } from '@covid/components/Text';
+import { lazyInject } from '@covid/provider/services';
 import { Services } from '@covid/provider/services.types';
 import { ICoreService } from '@covid/core/user/UserService';
 import i18n from '@covid/locale/i18n';
@@ -41,6 +43,8 @@ export const ThankYouUKScreen = (props: RenderProps) => {
 
   const [askForRating, setAskForRating] = useState<boolean>(false);
   const [inviteToStudy, setInviteToStudy] = useState<boolean>(false);
+  const [playing, setPlaying] = useState<boolean>(false);
+  const playerRef = useRef();
 
   useEffect(() => {
     async function fetchData() {
@@ -81,11 +85,22 @@ export const ThankYouUKScreen = (props: RenderProps) => {
               aspectRatio={1.5}
             />
 
-            <ExternalCallout
-              link="https://youtu.be/aUlNdcZnOac"
-              calloutID="tim_update_002"
-              imageSource={timUpdate002}
-              aspectRatio={1.178}
+            <YoutubePlayer
+              ref={playerRef}
+              height={220}
+              // width={400}
+              videoId="ulG3Fet-SR8"
+              play={playing}
+              onChangeState={(event) => console.log(event)}
+              onReady={() => console.log('ready')}
+              onError={(e) => console.log(e)}
+              onPlaybackQualityChange={(q) => console.log(q)}
+              volume={50}
+              playbackRate={1}
+              initialPlayerParams={{
+                cc_lang_pref: 'us',
+                showClosedCaptions: true,
+              }}
             />
 
             <ExternalCallout
