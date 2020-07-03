@@ -24,7 +24,11 @@ export default class ThankYouScreen extends Component<RenderProps, { askForRatin
     askForRating: false,
   };
 
-  async componentDidMount() {
+  componentDidMount() {
+    this.checkRating();
+  }
+
+  async checkRating() {
     // Ask for rating if not asked before and server indicates eligible.
     if (await shouldAskForRating()) {
       this.setState({ askForRating: true });

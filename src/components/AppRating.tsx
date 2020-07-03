@@ -56,16 +56,16 @@ export class AppRating extends Component<PropsType, State> {
 
   takeToStore = () => {
     contentService.setAskedToRateStatus('asked');
-    if (Platform.OS != 'ios') {
-      Linking.openURL(AndroidLink).catch((err) => {});
+    if (Platform.OS !== 'ios') {
+      Linking.openURL(AndroidLink);
     } else {
       const storeLink = isUSCountry() ? USiOSLink : isSECountry() ? SEiOSLink : UKiOSLink;
-      Linking.openURL(storeLink).catch((err) => {});
+      Linking.openURL(storeLink);
     }
     this.setState({ isModalOpen: false });
   };
 
-  askToRate = (e: any) => {
+  askToRate = (_: any) => {
     this.setState({ showTakeToStore: true });
   };
 

@@ -51,6 +51,10 @@ export class WelcomeRepeatScreen extends Component<PropsType, WelcomeRepeatScree
   state: WelcomeRepeatScreenState = initialState;
 
   async componentDidMount() {
+    await this.setup();
+  }
+
+  async setup() {
     appCoordinator.resetNavigation((this.props.navigation as unknown) as NavigationType);
     const userCount = await contentService.getUserCount();
     this.setState({ userCount: cleanIntegerVal(userCount as string) });
@@ -58,7 +62,6 @@ export class WelcomeRepeatScreen extends Component<PropsType, WelcomeRepeatScree
     this.setState({ showPartnerLogos: feature.showPartnerLogos });
     AnalyticsService.identify();
     await pushNotificationService.refreshPushToken();
-
     const content = await contentService.getWelcomeRepeatContent();
     this.setState({ calloutBoxContent: content });
   }

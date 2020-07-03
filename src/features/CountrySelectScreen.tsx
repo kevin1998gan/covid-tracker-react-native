@@ -25,10 +25,6 @@ export class CountrySelectScreen extends Component<Props, object> {
   @lazyInject(Services.User)
   userService: ICoreService;
 
-  constructor(props: Props) {
-    super(props);
-  }
-
   private selectCountry = async (countryCode: string) => {
     await this.userService.setUserCountry(countryCode);
     const { patientId } = this.props.route.params;

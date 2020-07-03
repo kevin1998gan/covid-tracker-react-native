@@ -1,7 +1,7 @@
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { PatientStateType } from '@covid/core/patient/PatientState';
-import UserService, { ICoreService } from '@covid/core/user/UserService';
+import { ICoreService } from '@covid/core/user/UserService';
 import { ScreenParamList } from '@covid/features/ScreenParamList';
 import { AppCoordinator } from '@covid/features/AppCoordinator';
 

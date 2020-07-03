@@ -3,7 +3,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Formik, FormikProps } from 'formik';
 import { Form, Text } from 'native-base';
 import React, { Component } from 'react';
-import { StyleSheet } from 'react-native';
 import * as Yup from 'yup';
 
 import DropdownField from '@covid/components/DropdownField';
@@ -93,8 +92,11 @@ export default class AboutYouScreen extends Component<AboutYouProps, State> {
   }
 
   async componentDidMount() {
-    const features = this.userService.getConfig();
+    this.setFeatures();
+  }
 
+  setFeatures() {
+    const features = this.userService.getConfig();
     this.setState({
       showRaceQuestion: features.showRaceQuestion,
       showEthnicityQuestion: features.showEthnicityQuestion,
@@ -415,9 +417,3 @@ export default class AboutYouScreen extends Component<AboutYouProps, State> {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  textItemStyle: {
-    borderColor: 'transparent',
-  },
-});

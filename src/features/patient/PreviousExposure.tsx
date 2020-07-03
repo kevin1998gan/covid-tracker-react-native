@@ -117,10 +117,10 @@ export default class PreviousExposureScreen extends Component<HealthProps, State
 
     this.userService
       .updatePatient(patientId, infos)
-      .then((response) => {
+      .then((_) => {
         patientCoordinator.gotoNextScreen(this.props.route.name);
       })
-      .catch((err) => {
+      .catch((_) => {
         this.setState({ errorMessage: i18n.t('something-went-wrong') });
       });
   }

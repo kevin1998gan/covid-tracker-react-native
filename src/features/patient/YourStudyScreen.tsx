@@ -259,10 +259,10 @@ export default class YourStudyScreen extends Component<YourStudyProps, State> {
 
     this.userService
       .updatePatient(patientId, infos)
-      .then((response) => {
+      .then((_) => {
         patientCoordinator.gotoNextScreen(this.props.route.name);
       })
-      .catch((err) => this.setState({ errorMessage: i18n.t('something-went-wrong') }));
+      .catch((_) => this.setState({ errorMessage: i18n.t('something-went-wrong') }));
   }
 
   render() {

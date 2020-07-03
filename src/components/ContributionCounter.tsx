@@ -5,7 +5,7 @@ import reactStringReplace from 'react-string-replace';
 
 import { colors } from '@theme';
 import i18n from '@covid/locale/i18n';
-import UserService, { ICoreService } from '@covid/core/user/UserService';
+import { ICoreService } from '@covid/core/user/UserService';
 import { useInjection } from '@covid/provider/services.hooks';
 import { Services } from '@covid/provider/services.types';
 

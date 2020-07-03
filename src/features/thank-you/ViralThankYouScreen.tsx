@@ -134,6 +134,10 @@ export default class ViralThankYouScreen extends Component<Props, State> {
   state = { ...initalState };
 
   async componentDidMount() {
+    await this.checkRating();
+  }
+
+  async checkRating() {
     if (await shouldAskForRating()) {
       this.setState({ askForRating: true });
     }

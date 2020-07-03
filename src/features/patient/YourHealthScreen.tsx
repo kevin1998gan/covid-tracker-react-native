@@ -206,7 +206,7 @@ export default class YourHealthScreen extends Component<HealthProps, State> {
 
         patientCoordinator.gotoNextScreen(this.props.route.name);
       })
-      .catch((err) => {
+      .catch((_) => {
         this.setState({ errorMessage: 'Something went wrong, please try again later' });
       });
   }
