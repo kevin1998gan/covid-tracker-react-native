@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { colors } from '@theme';
 import i18n from '@covid/locale/i18n';
-import { BrandedButton, HeaderText, RegularText, SecondaryText, CaptionText } from '@covid/components/Text';
+import { BrandedButton, HeaderText, RegularText, SecondaryText } from '@covid/components/Text';
 import { Header, isAndroid } from '@covid/components/Screen';
 import PatientHeader from '@covid/components/PatientHeader';
 import assessmentCoordinator from '@covid/core/assessment/AssessmentCoordinator';
@@ -40,26 +40,21 @@ export const VaccineRegistryInfoScreen: React.FC<RenderProps> = (props) => {
 
           <RegularText style={styles.interestedTest1}>{i18n.t('vaccine-registry.not-ourselves')}</RegularText>
 
-          <CaptionText style={styles.interestedTest2}>
-            {i18n.t('vaccine-registry.not-share')}{' '}
-            <CaptionText style={styles.interestedTest3}>{i18n.t('vaccine-registry.prioritise')}</CaptionText>
-          </CaptionText>
+          <SecondaryText style={styles.interestedTest2}>{i18n.t('vaccine-registry.not-share')}</SecondaryText>
 
-          <View style={styles.shareCard}>
-            <BaseShareAppCard
-              secondaryText={i18n.t('vaccine-registry.share-text')}
-              ctaTitle={i18n.t('vaccine-registry.tell-friends')}
-              onSharePress={share}
-            />
-          </View>
+          <BaseShareAppCard
+            secondaryText={i18n.t('vaccine-registry.share-text')}
+            ctaTitle={i18n.t('vaccine-registry.tell-friends')}
+            onSharePress={share}
+          />
 
           <View style={styles.buttonContainer}>
             <BrandedButton
-              style={styles.button}
+              style={styles.yesButton}
               onPress={() => {
                 assessmentCoordinator.gotoNextScreen(props.route.name);
               }}>
-              <RegularText style={styles.buttonText}>{i18n.t('vaccine-registry.next')}</RegularText>
+              <RegularText style={styles.yesButtonText}>{i18n.t('vaccine-registry.next')}</RegularText>
             </BrandedButton>
           </View>
         </View>
@@ -70,7 +65,7 @@ export const VaccineRegistryInfoScreen: React.FC<RenderProps> = (props) => {
 
 const styles = StyleSheet.create({
   contentContainer: {
-    marginHorizontal: 24,
+    paddingHorizontal: 32,
     flexGrow: 1,
     alignItems: 'center',
   },
@@ -84,41 +79,38 @@ const styles = StyleSheet.create({
     marginTop: 32,
   },
   header: {
+    marginTop: 24,
     textAlign: 'center',
   },
   paragraph: {
     marginVertical: 8,
   },
-  button: {
-    marginVertical: 16,
+  yesButton: {
+    marginTop: 16,
+    marginHorizontal: 16,
     backgroundColor: colors.purple,
   },
-  buttonText: {
+  noButton: {
+    marginTop: 16,
+    marginHorizontal: 16,
+    backgroundColor: colors.backgroundTertiary,
+  },
+  yesButtonText: {
     color: colors.white,
+  },
+  noButtonText: {
+    color: colors.primary,
   },
   interestedTitle: {
     marginTop: 20,
     fontSize: 20,
   },
   interestedTest1: {
-    marginHorizontal: 8,
-    marginVertical: 12,
+    marginVertical: 16,
     textAlign: 'center',
-    fontWeight: '300',
   },
   interestedTest2: {
-    marginHorizontal: 8,
-    marginTop: 12,
-    marginBottom: 40,
+    marginVertical: 16,
     textAlign: 'center',
-    fontWeight: '300',
-    color: colors.primary,
-  },
-  interestedTest3: {
-    fontWeight: '500',
-    color: colors.primary,
-  },
-  shareCard: {
-    marginHorizontal: -10,
   },
 });

@@ -54,7 +54,7 @@ export const VaccineRegistrySignUpScreen: React.FC<RenderProps> = (props) => {
 
 const styles = StyleSheet.create({
   contentContainer: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 32,
     flexGrow: 1,
     alignItems: 'center',
   },
@@ -68,6 +68,7 @@ const styles = StyleSheet.create({
     marginTop: 32,
   },
   header: {
+    marginTop: 24,
     textAlign: 'center',
   },
   paragraph: {
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   interestedTest: {
-    marginHorizontal: 16,
+    marginHorizontal: 40,
     textAlign: 'center',
   },
 });

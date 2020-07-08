@@ -21,7 +21,4 @@ export default {
 
   ukValidationStudyConsentVersion: 'v3',
   ukValidationStudyAdVersion: 'v2',
-
-  vaccineRegistryVersion: 'v1',
-  vaccineRegistryAdVersion: 'v1',
 };

@@ -11,7 +11,6 @@ import { Services } from '@covid/provider/services.types';
 import { colors } from '@theme';
 import { ScreenParamList } from '@covid/features/ScreenParamList';
 import appConfig from '@covid/appConfig';
-import appCoordinator from '@covid/features/AppCoordinator';
 
 import ConsentScreenGB from './ConsentScreenGB';
 import ConsentScreenSE from './ConsentScreenSE';
@@ -40,7 +39,7 @@ const ConsentScreen: FC<PropsType> = (props) => {
     if (isSECountry()) {
       await userService.setConsentSigned('SE', appConfig.consentVersionSE, appConfig.privacyPolicyVersionSE);
     }
-    appCoordinator.gotoNextScreen(props.route.name);
+    props.navigation.navigate('Register');
   }, [agreed, userService.setConsentSigned]);
 
   const renderConsent = useCallback(() => {

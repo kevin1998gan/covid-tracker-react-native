@@ -407,7 +407,7 @@ export default class UserService extends ApiClientBase implements ICoreService {
   public async getProfile(): Promise<UserResponse> {
     const localUser = await AsyncStorageService.GetStoredData();
     if (!localUser) {
-      await this.logout();
+      this.logout();
       throw Error("User not found. Can't fetch profile");
     }
 
@@ -588,8 +588,7 @@ export default class UserService extends ApiClientBase implements ICoreService {
     return this.client.post('/study_consent/', {
       study: 'Vaccine Register',
       status: response ? 'signed' : 'declined',
-      version: appConfig.vaccineRegistryVersion, // Mandatory field but unused for vaccine registry
-      ad_version: appConfig.vaccineRegistryAdVersion,
+      version: 'v1', // Mandatory field but unused for vaccine registry
     });
   }
 

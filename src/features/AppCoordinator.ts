@@ -1,3 +1,4 @@
+import { CommonActions } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { ConfigType } from '@covid/core/Config';
@@ -88,9 +89,6 @@ export class AppCoordinator {
       this.navigation.navigate('ValidationStudyConsent', {
         viewOnly: false,
       });
-    },
-    Consent: () => {
-      this.navigation.navigate('Register');
     },
   } as ScreenFlow;
 

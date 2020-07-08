@@ -935,7 +935,6 @@
       "creating-registry": false,
       "not-ourselves": false,
       "not-share": false,
-      "prioritise": false,
       "tell-friends": false,
       "share-text": false
     }
