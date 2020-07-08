@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 
 import { SelectableButton } from '@covid/components/SelectableButton';
 import i18n from '@covid/locale/i18n';
 
-interface SelectableItem {
+export interface SelectableItem {
   title: string;
 }
 
