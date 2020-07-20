@@ -11,7 +11,7 @@ import Screen, { FieldWrapper, Header, ProgressBlock } from '@covid/components/S
 import { BrandedButton, HeaderText, LabelText } from '@covid/components/Text';
 import UserService from '@covid/core/user/UserService';
 import i18n from '@covid/locale/i18n';
-import AssessmentCoordinator from '@covid/features/assessment/AssessmentCoordinator';
+import AssessmentCoordinator from '@covid/core/assessment/AssessmentCoordinator';
 import { assessmentService } from '@covid/Services';
 import { colors } from '@theme';
 
@@ -37,7 +37,6 @@ type State = {
 export default class TreatmentOtherScreen extends Component<TreatmentOtherProps, State> {
   constructor(props: TreatmentOtherProps) {
     super(props);
-    AssessmentCoordinator.resetNavigation(props.navigation);
     this.handleUpdateTreatment = this.handleUpdateTreatment.bind(this);
     this.focus = this.focus.bind(this);
     this.blur = this.blur.bind(this);

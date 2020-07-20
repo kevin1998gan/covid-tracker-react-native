@@ -1,38 +1,42 @@
 import { AxiosResponse } from 'axios';
 import * as Localization from 'expo-localization';
+import { injectable } from 'inversify';
 
-import { ukValidationStudyConsentVersion } from '@covid/features/register/constants';
 import i18n from '@covid/locale/i18n';
 import { AvatarName } from '@covid/utils/avatar';
 import { getDaysAgo } from '@covid/utils/datetime';
+import appConfig from '@covid/appConfig';
 
-import appConfig from '../../../appConfig';
 import { AsyncStorageService } from '../AsyncStorageService';
-import { getCountryConfig, ConfigType } from '../Config';
+import { ConfigType, getCountryConfig } from '../Config';
 import { UserNotFoundException } from '../Exception';
 import { ApiClientBase } from '../api/ApiClientBase';
 import { handleServiceError } from '../api/ApiServiceErrors';
 import { camelizeKeys } from '../api/utils';
-import { getInitialPatientState, PatientStateType, PatientProfile } from '../patient/PatientState';
-import { cleanIntegerVal } from '../utils/number';
+import { getInitialPatientState, PatientProfile, PatientStateType } from '../patient/PatientState';
+import { cleanIntegerVal } from '../../utils/number';
 
 import {
-  AreaStatsResponse,
-  AskValidationStudy,
+  AskForStudies,
   Consent,
   LoginOrRegisterResponse,
   PatientInfosRequest,
   PiiRequest,
-  StartupInfo,
   UserResponse,
 } from './dto/UserAPIContracts';
 
 const MAX_DISPLAY_REPORT_FOR_OTHER_PROMPT = 3;
 const FREQUENCY_TO_ASK_ISOLATION_QUESTION = 7;
 
+export type AuthenticatedUser = {
+  userToken: string;
+  userId: string;
+};
+
 // Attempt to split UserService into discrete service interfaces, which means:
 // TODO: Split into separate self-contained services
 export interface IUserService {
+  hasUser: boolean;
   register(email: string, password: string): Promise<any>; // TODO: define return object
   login(email: string, password: string): Promise<any>; // TODO: define return object
   logout(): void;
@@ -40,6 +44,13 @@ export interface IUserService {
   getProfile(): Promise<UserResponse>;
   updatePii(pii: Partial<PiiRequest>): Promise<any>;
   deleteRemoteUserData(): Promise<any>;
+  loadUser(): void;
+  getFirstPatientId(): Promise<string | null>;
+  setValidationStudyResponse(response: boolean, anonymizedData?: boolean, reContacted?: boolean): void;
+  setUSStudyInviteResponse(patientId: string, response: boolean): void;
+  shouldAskForValidationStudy(onThankYouScreen: boolean): Promise<boolean>;
+  shouldAskForVaccineRegistry(): Promise<boolean>;
+  setVaccineRegistryResponse(response: boolean): void;
 }
 
 export interface IProfileService {
@@ -60,7 +71,7 @@ export interface IPatientService {
   updatePatient(patientId: string, infos: Partial<PatientInfosRequest>): Promise<any>;
   getPatient(patientId: string): Promise<PatientInfosRequest | null>;
   updatePatientState(patientState: PatientStateType, patient: PatientInfosRequest): Promise<PatientStateType>;
-  getCurrentPatient(patientId: string, patient?: PatientInfosRequest): Promise<PatientStateType>;
+  getPatientState(patientId: string, patient?: PatientInfosRequest): Promise<PatientStateType>;
 }
 
 export interface ILocalisationService {
@@ -73,13 +84,17 @@ export interface ILocalisationService {
   // static setLocaleFromCountry(countryCode: string): void;  // TODO: change from static to instance method
 }
 
-export default class UserService extends ApiClientBase
-  implements
-    IUserService, // TODO: ideally a UserService should only implement this, everything else is a separate service
+export interface ICoreService
+  extends IUserService,
     IProfileService,
     IConsentService,
     IPatientService,
-    ILocalisationService {
+    ILocalisationService {}
+
+// TODO: ideally a UserService should only implement this, everything else is a separate service
+
+@injectable()
+export default class UserService extends ApiClientBase implements ICoreService {
   public static userCountry = 'US';
   public static ipCountry = '';
   public static countryConfig: ConfigType;
@@ -89,8 +104,11 @@ export default class UserService extends ApiClientBase
     privacy_policy_version: '',
   };
 
+  public hasUser = false;
+
   constructor(private useAsyncStorage: boolean = true) {
     super();
+    this.loadUser();
   }
 
   configEncoded = {
@@ -119,6 +137,7 @@ export default class UserService extends ApiClientBase
   }
 
   public async logout() {
+    this.hasUser = false;
     await this.deleteLocalUserData();
   }
 
@@ -142,13 +161,50 @@ export default class UserService extends ApiClientBase
     await this.storeTokenInAsyncStorage(authToken, data.user.pii);
     await AsyncStorageService.saveProfile(data.user);
     this.client.defaults.headers['Authorization'] = 'Token ' + authToken;
-
+    this.hasUser = true;
     return data;
+  };
+
+  async loadUser() {
+    const user = await AsyncStorageService.GetStoredData();
+    this.hasUser = !!user && !!user!.userToken && !!user!.userId;
+    this.updateUserCountry(this.hasUser);
+    if (this.hasUser) {
+      await ApiClientBase.setToken(user!.userToken, user!.userId);
+      const patientId: string | null = await this.getFirstPatientId();
+      if (!patientId) {
+        // Logged in with an account doesn't exist. Force logout.
+        await this.logout();
+      }
+    }
+  }
+
+  async getFirstPatientId(): Promise<string | null> {
+    try {
+      const profile = await this.getProfile();
+      return profile.patients[0];
+    } catch (error) {
+      return null;
+    }
+  }
+
+  private updateUserCountry = async (isLoggedIn: boolean) => {
+    const country: string | null = await this.getUserCountry();
+    this.initCountryConfig(country ?? 'GB');
+    if (isLoggedIn) {
+      // If logged in with no country default to GB as this will handle all
+      // GB users before selector was included.
+      if (country === null) {
+        await this.setUserCountry('GB');
+      }
+    } else {
+      await this.defaultCountryFromLocale();
+    }
   };
 
   getData = <T>(response: AxiosResponse<T>) => {
     if (typeof response.data === 'string') {
-      return <T>camelizeKeys(JSON.parse(response.data));
+      return camelizeKeys(JSON.parse(response.data)) as T;
     } else {
       return response.data;
     }
@@ -286,13 +342,19 @@ export default class UserService extends ApiClientBase
 
     const hasVitaminAnswer = !!patient.vs_asked_at;
     const shouldAskLevelOfIsolation = UserService.shouldAskLevelOfIsolation(patient.last_asked_level_of_isolation);
+    const shouldAskLifestyleQuestion = patient.should_ask_lifestyle_questions;
 
     // Decide whether patient needs to answer YourStudy questions
     const consent = await this.getConsentSigned();
     const shouldAskStudy = (isUSCountry() && consent && consent.document === 'US Nurses') || isGBCountry();
 
     const hasAtopyAnswers = patient.has_hayfever != null;
+    const hasDiabetes = patient.has_diabetes;
+    const hasDiabetesAnswers = patient.diabetes_type != null;
+    const shouldAskExtendedDiabetes = !hasDiabetesAnswers && hasDiabetes;
     const hasHayfever = patient.has_hayfever;
+    const shouldShowUSStudyInvite = patient.contact_additional_studies === null;
+    const hasBloodGroupAnswer = patient.blood_group != null;
 
     return {
       ...patientState,
@@ -309,32 +371,37 @@ export default class UserService extends ApiClientBase
       isReportedByAnother,
       isSameHousehold,
       shouldAskLevelOfIsolation,
+      shouldAskExtendedDiabetes,
       shouldAskStudy,
       hasAtopyAnswers,
+      hasDiabetes,
+      hasDiabetesAnswers,
       hasHayfever,
+      shouldShowUSStudyInvite,
+      shouldAskLifestyleQuestion,
+      hasBloodGroupAnswer,
     };
   }
 
-  public async getCurrentPatient(patientId: string, patient?: PatientInfosRequest): Promise<PatientStateType> {
-    let currentPatient = getInitialPatientState(patientId);
+  public async getPatientState(patientId: string): Promise<PatientStateType> {
+    let patientState = getInitialPatientState(patientId);
 
-    try {
-      if (!patient) {
-        const loadPatient = await this.getPatient(patientId);
-        patient = loadPatient ?? patient;
-      }
-    } catch (error) {
-      handleServiceError(error);
+    const patientInfo = await this.getPatient(patientId);
+
+    if (patientInfo) {
+      patientState = await this.updatePatientState(patientState, patientInfo);
     }
 
-    if (patient) {
-      currentPatient = await this.updatePatientState(currentPatient, patient);
-    }
-
-    return currentPatient;
+    return patientState;
   }
 
   public async getProfile(): Promise<UserResponse> {
+    const localUser = await AsyncStorageService.GetStoredData();
+    if (!localUser) {
+      await this.logout();
+      throw Error("User not found. Can't fetch profile");
+    }
+
     const localProfile = await AsyncStorageService.getProfile();
 
     // If not stored locally, wait for server response.
@@ -348,6 +415,7 @@ export default class UserService extends ApiClientBase
     this.client.get<UserResponse>(`/profile/`).then(async (profileResponse) => {
       await AsyncStorageService.saveProfile(profileResponse.data);
     });
+
     return localProfile;
   }
 
@@ -395,15 +463,15 @@ export default class UserService extends ApiClientBase
     if (await AsyncStorageService.getAskedCountryConfirmation()) {
       return false;
     } else {
-      return UserService.userCountry != UserService.ipCountry;
+      return UserService.userCountry !== UserService.ipCountry;
     }
   }
 
   async defaultCountryFromLocale() {
     const country = () => {
-      if (Localization.locale == 'en-GB') {
+      if (Localization.locale === 'en-GB') {
         return 'GB';
-      } else if (Localization.locale == 'sv-SE') {
+      } else if (Localization.locale === 'sv-SE') {
         return 'SE';
       } else {
         return 'US';
@@ -462,7 +530,7 @@ export default class UserService extends ApiClientBase
 
   private static setLocaleFromCountry(countryCode: string) {
     let USLocale = 'en';
-    if (Localization.locale == 'es-US') {
+    if (Localization.locale === 'es-US') {
       USLocale = 'es';
     }
 
@@ -475,28 +543,51 @@ export default class UserService extends ApiClientBase
     i18n.locale = localeMap[countryCode] + '-' + UserService.userCountry;
   }
 
-  private static getLocale() {
-    return Localization.locale.split('-')[0];
+  static getLocale() {
+    return i18n.locale.split('-')[0];
   }
 
   async shouldAskForValidationStudy(onThankYouScreen: boolean): Promise<boolean> {
-    let url = `/study_consent/status/?consent_version=${ukValidationStudyConsentVersion}`;
+    let url = `/study_consent/status/?consent_version=${appConfig.ukValidationStudyConsentVersion}`;
     if (onThankYouScreen) {
       url += '&thank_you_screen=true';
     }
 
-    const response = await this.client.get<AskValidationStudy>(url);
+    const response = await this.client.get<AskForStudies>(url);
     return response.data.should_ask_uk_validation_study;
+  }
+
+  async shouldAskForVaccineRegistry(): Promise<boolean> {
+    if (!isGBCountry()) return Promise.resolve(false);
+
+    const url = `/study_consent/status/?home_screen=true`;
+
+    const response = await this.client.get<AskForStudies>(url);
+    return response.data.should_ask_uk_vaccine_register;
   }
 
   setValidationStudyResponse(response: boolean, anonymizedData?: boolean, reContacted?: boolean) {
     return this.client.post('/study_consent/', {
       study: 'UK Validation Study',
-      version: ukValidationStudyConsentVersion,
+      version: appConfig.ukValidationStudyConsentVersion,
+      ad_version: appConfig.ukValidationStudyAdVersion,
       status: response ? 'signed' : 'declined',
       allow_future_data_use: anonymizedData,
       allow_contact_by_zoe: reContacted,
     });
+  }
+
+  setVaccineRegistryResponse(response: boolean) {
+    return this.client.post('/study_consent/', {
+      study: 'Vaccine Register',
+      status: response ? 'signed' : 'declined',
+      version: appConfig.vaccineRegistryVersion, // Mandatory field but unused for vaccine registry
+      ad_version: appConfig.vaccineRegistryAdVersion,
+    });
+  }
+
+  setUSStudyInviteResponse(patientId: string, response: boolean) {
+    this.updatePatient(patientId, { contact_additional_studies: response });
   }
 }
 

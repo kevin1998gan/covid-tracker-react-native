@@ -80,7 +80,7 @@ npm install expo-cli --g
 4. Run the following command to create `AMPLITUDE_KEY` environment variable:
 
    ```sh
-   echo "AMPLITUDE_KEY=test_key" > .env
+   echo "AMPLITUDE_KEY=test_key" >> .env
    ```
 
 5. Create an empty `./google-services.json` file in the root of the application.
@@ -149,6 +149,10 @@ These are some known, common issues and their solutions:
 1. Changes to .env don't get picked up.
 
 - Solution: Change some of the source code or restart the expo project running `expo start -c`
+
+2. Unable to resolve module `deprecated-react-native-listview`
+
+- Solution: Running `rm -rf $TMPDIR/metro-cache` has been reported to solve the problem. 
 
 ## License
 

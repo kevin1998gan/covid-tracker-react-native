@@ -192,6 +192,8 @@
 
   "picker-yes": "Yes",
   "picker-no": "No",
+  "picker-unsure": "Unsure",
+  "please-select-option": "Please select an option",
   "placeholder-optional-question": "*Optional",
   "placeholder-optional": "Optional",
 
@@ -304,6 +306,10 @@
     "page-title-detail-update": "Update test",
     "add-test": "Add test",
     "update-test": "Update test",
+    "delete-test": "Delete test",
+
+    "delete-test-alert-title": "Delete this test?",
+    "delete-test-alert-text": "This information will be lost. Do you want to continue?",
 
     "question-select-a-date-range": "Select a date range",
     "question-select-a-date": "Select a date",
@@ -314,27 +320,45 @@
     "picker-nose-throat-swab": "A swab of my nose or throat",
     "picker-saliva-sample": "I spat in a cup/tube",
     "picker-blood-sample": "I gave a blood sample",
+    "picker-finger-prick": "A finger-prick blood test",
+    "picker-blood-draw": "A blood test, done using a needle",
     "picker-other": "Other, please specify",
 
     "question-mechanism-specify": "Please indicate how the test was performed",
 
-    "question-result": "Did you test positive for COVID-19?",
+    "question-trained-worker": "Did a trained worker swab you?",
 
+    "location": {
+      "question": "Where was your test performed?",
+      "specify": "Please specify the test location",
+      "answers": {
+        "at-home": "At Home",
+        "drive-through-rtc": "Drive-through Regional Testing Centre",
+        "drop-in-facility": "Drop-in testcenter",
+        "hospital": "Hospital (not drive-through)",
+        "gp": "GP",
+        "chemist-pharmacy": "Chemist / Pharmacy",
+        "store-pharmacy": "Store or pharmacy clinic",
+        "work": "Work (excluding hospital or GP)",
+        "local-health-department": "Local health department",
+        "other": "Other, please specify"
+      }
+    },
+
+    "question-invite-to-test": "Did we invite you to perform this test?",
+
+    "question-result": "What are the results of this test?",
+    "picker-positive": "Positive",
+    "picker-negative": "Negative",
     "picker-waiting": "Waiting for results",
-    "picker-test-failed": "Not clear/Test Failed",
+    "picker-test-failed": "Not clear / failed",
 
     "question-knows-date-of-test": "Do you know the date of your test?",
     "question-date-test-occurred": "When was your test?",
-
     "question-date-test-occurred-guess": "Between which two dates do you think you had your test?",
-    "picker-less-than-7-days-ago": "Less than 7 days ago",
-    "picker-over-1-week-ago": "Over 1 week ago",
-    "picker-over-2-week-ago": "Over 2 weeks ago",
-    "picker-over-3-week-ago": "Over 3 weeks ago",
-    "picker-over-1-month-ago": "Over 1 month ago",
 
     "required-date": "Please indicate the date this test occurred",
-    "required-dates": "Please indicate between which two date this test occurred",
+    "required-dates": "Please indicate between which two dates this test occurred",
     "required-mechanism": "Please indicate how the test was performed",
     "required-result": "Please indicate the result of the test"
   },
@@ -539,11 +563,12 @@
   },
 
   "research-updates": "Research updates",
-  "faqs": "FAQs",
+  "faqs": "Frequently asked questions",
   "privacy-policy": "Privacy policy",
   "delete-my-data": "Delete my data",
   "delete-data-alert-title": "Are you sure?",
   "delete-data-alert-text": "Deleting your account and data cannot be undone.",
+  "push-notifications": "Turn on reminders",
   "cancel": "Cancel",
   "delete": "Delete",
   "logout": "Log out",
@@ -593,8 +618,7 @@
   "select-profile-last-report": "Last report:",
   "default-profile-name": "Me",
 
-  "validation-error-text": "Please fill in or correct the above information: %{info}",
-  "validation-error-text-no-info": "Please fill in or correct the above information",
+  "validation-error-text": "Please fill in or correct the above information",
 
   "race-question": "Which of the following best describes your ethnicity?",
   "race-other-question": "Please specify your ethnicity",
@@ -625,15 +649,17 @@
   "total-people-contributing": "%{total} people contributing",
   "join-total-people-contributing": "Join %{total} people contributing worldwide",
 
-  "add-new-test": "Add new test",
-  "your-covid-tests": "Your COVID-19 tests",
-  "positive": "Positive",
-  "negative": "Negative",
-  "failed": "Failed",
-  "pending": "Pending",
-  "please-add-test-below": "If you’ve ever had a COVID-19 test, please add below. This includes PCR, antigen and antibody tests. You can edit these at any time in the future.",
-  "never-had-test": "I have never had a COVID test",
-  "above-list-correct": "The above list is correct",
+  "covid-test-list": {
+    "title": "Your COVID-19 tests",
+    "text": "If you’ve ever had a COVID-19 test, please add below. This includes PCR, antigen and antibody tests. You can edit these at any time in the future.",
+    "add-new-test": "Add new test",
+    "positive": "Positive",
+    "negative": "Negative",
+    "failed": "Failed",
+    "pending": "Pending",
+    "never-had-test": "I have never had a COVID test",
+    "above-list-correct": "This list is correct"
+  },
 
   "errors": {
     "button-retry": "Retry",
@@ -893,5 +919,119 @@
     "respirator": "N95/FFP respirator",
     "not-sure": "Not sure/prefer not to say",
     "other": "Other, please specify:"
+  },
+
+  "us-study-invite": {
+    "title": "New COVID studies\n& how you can help",
+    "body": "Are you interested in being contacted to learn about additional studies related to COVID-19 or use of this app?",
+    "button": "I am interested"
+  },
+
+  "diabetes": {
+    "justification": "You previously indicated that you had diabetes, which is an important risk factor for COVID. Our scientists have a couple of follow up questions to understand more about this. These questions are completely optional.",
+    "which-type": "What kind of diabetes do you have?",
+    "answer-type-1": "Type 1 diabetes",
+    "answer-type-2": "Type 2 diabetes",
+    "answer-gestational": "Gestational diabetes (during pregnancy)",
+    "answer-unsure": "Unsure",
+    "answer-other": "Other, please specify",
+    "most-recent-hemoglobin-measure": "What was your most recent hemoglobin A1c?",
+    "hemoglobin-measurement-unit-percent": "%",
+    "hemoglobin-measurement-unit-mol": "mmol/mol",
+    "when-was-diagnosed": "What year were you diagnosed with diabetes?",
+    "which-treatment": "Which diabetes treatments do you use? Select all that apply:",
+    "answer-none": "None",
+    "answer-lifestyle-mod": "Lifestyle modification (e.g. exercise, diet, weight management)",
+    "answer-daily-injections": "Once or twice daily injections of long acting insulin or \"basal\" insulin (e.g. glargine, detemir, degludec or NPH in premixed insulin)",
+    "answer-rapid-injections": "Rapid acting insulin injections with meals or as \"bolus\" (e.g. lispro, aspart, glulisine, or in premixed insulin)",
+    "answer-insulin-pump": "Continuous infusion in an insulin pump",
+    "answer-non-insulin-injections": "Injections of a non-insulin diabetes medication or GLP-1 receptor agonists (e.g. semaglutide, dulaglutide, liraglutide)",
+    "answer-other-oral-meds": "Medications taken by mouth",
+    "which-oral-treatment": "Which oral medications do you use? Select all that apply",
+    "answer-oral-biguanide": "Biguanide (Metformin)",
+    "answer-sulfonylurea": "Sulfonylurea (e.g. glipizide, glyburide, glimepiride, gliclazide)",
+    "answer-dpp": "DPP-4 inhibitors (e.g. saxagliptin, sitagliptin, linagliptin)",
+    "answer-meglitinides": "Meglitinides (e.g. repaglinide, nateglinide)",
+    "answer-thiazolidinediones": "Thiazolidinediones or Glitazones (e.g. rosiglitazone, pioglitazone)",
+    "answer-sglt": "SGLT-2 inhibitors (e.g. canagliflozin, dapagliflozin)",
+    "answer-other-oral-meds-not-listed": "Other oral diabetes medication not listed",
+    "please-specify-other-oral-meds": "Please specify the oral medications",
+    "please-select-diabetes-type": "Please select an option",
+    "please-select-diabetes-treatment": "Please select one or more of the above",
+    "question-use-cgm": "Do you use a continuous glucose monitor (CGM)?"
+  },
+
+  "lifestyle": {
+    "title": "Diet & lifestyle",
+    "explanation": "The following questions on weight, nutrition and exercise are to help us understand whether COVID may be impacting our health in these areas and how significant these effects are. These questions are all optional.",
+    "text": "Since March when COVID became prevalent:",
+    "please-select-option": "Please select an option",
+    "weight-change": {
+      "question": "How has your weight changed?",
+      "increased": "Increased",
+      "decreased": "Decreased",
+      "same": "Stayed the same",
+      "unsure-pfnts": "Unsure / Prefer not to say"
+    },
+    "weight-difference": "By how much (an estimate is fine)?",
+    "diet-change": {
+      "question": "How was your diet changed in your opinion?",
+      "increased": "It has become healthier",
+      "decreased": "It has become more unhealthy",
+      "same": "It has stayed the same",
+      "unsure-pfnts": "Unsure / Prefer not to say"
+    },
+    "snacking-change": {
+      "question": "How has your snacking changed?",
+      "increased": "I am snacking more",
+      "decreased": "I am snacking less",
+      "same": "My snacking levels are the same",
+      "unsure-pfnts": "Unsure / Prefer not to say"
+    },
+    "alcohol-change": {
+      "question": "How has your alcohol consumption changed? ",
+      "no-alcohol": "I don't drink alcohol",
+      "increased": "I am drinking more alcohol",
+      "decreased": "I am drinking less alcohol",
+      "same": "My alcohol consumption is the same",
+      "unsure-pfnts": "Unsure / Prefer not to say"
+    },
+    "activity-change": {
+      "question": "Have your physical activity levels changed?",
+      "increased": "Yes, increased",
+      "decreased": "Yes, decreased",
+      "same": "No change, has remained the same",
+      "unsure-pfnts": "Unsure / Prefer not to say"
+    }
+  },
+  "blood-group": {
+    "justification": "Other studies have shown that your blood group may affect both your risk and severity of COVID infection.",
+    "question": "What is your blood group?",
+    "answers": {
+      "type-a": "A",
+      "type-b": "B",
+      "type-ab": "AB",
+      "type-o": "O",
+      "dont-know": "I don't know",
+      "pfnts": "Prefer not to say"
+    }
+  },
+  "vaccine-registry": {
+    "covid-prevention": "COVID Prevention",
+    "can-we-contact": "Can we contact you about potential studies involving vaccines or other preventative treatments in the future?",
+    "yes": "Yes, I am interested",
+    "no": "No, thank you",
+    "next": "Next",
+    "creating-registry": "We are creating a registry",
+    "not-ourselves": "Though we will not be running any vaccine studies ourselves, various teams working on vaccines and other preventive treatments are asking us if we can find recruits. Therefore we are creating a list for them which you are now on.",
+    "not-share": "We will not share your details with anyone, but will alert you when a relevant study becomes available.",
+    "prioritise": "We aim to prioritise people who have been regularly logging on the app, and who are early members of this list.",
+    "tell-friends": "Please tell your friends",
+    "share-title": "Please share this app",
+    "share-text": "Do you know anyone who would be interested in this app or vaccine trials?",
+    "callout-title": "VACCINE",
+    "callout-text": "Would you like to join our COVID-19 vaccine registry?",
+    "callout-link-text": "I am interested",
+    "menu-item": "Join the vaccine registry"
   }
 }

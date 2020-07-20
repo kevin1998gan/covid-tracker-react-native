@@ -1,19 +1,20 @@
+import { injectable, inject } from 'inversify';
+
 import { AreaStatsResponse, StartupInfo } from '@covid/core/user/dto/UserAPIContracts';
 import { AppScreenContent } from '@covid/core/content/ScreenContentContracts';
+import { Services } from '@covid/provider/services.types';
 
 import { IApiClient } from '../api/ApiClient';
 
 export interface IContentApiClient {
   getAreaStats(patientId: string): Promise<AreaStatsResponse>;
   getStartupInfo(): Promise<StartupInfo>;
-  getScreenContent(): Promise<AppScreenContent>;
+  getScreenContent(countryCode: string, languageCode: string): Promise<AppScreenContent>;
 }
 
+@injectable()
 export class ContentApiClient implements IContentApiClient {
-  apiClient: IApiClient;
-  constructor(apiClient: IApiClient) {
-    this.apiClient = apiClient;
-  }
+  constructor(@inject(Services.Api) private apiClient: IApiClient) {}
 
   getAreaStats(patientId: string): Promise<AreaStatsResponse> {
     return this.apiClient.get<AreaStatsResponse>(`/area_stats/?patient=${patientId}`);
@@ -23,7 +24,9 @@ export class ContentApiClient implements IContentApiClient {
     return this.apiClient.get<StartupInfo>('/users/startup_info/');
   }
 
-  getScreenContent(): Promise<AppScreenContent> {
-    return this.apiClient.get<AppScreenContent>('/text/list/');
+  getScreenContent(countryCode: string, languageCode: string): Promise<AppScreenContent> {
+    return this.apiClient.get<AppScreenContent>(
+      `/text/list/?country_code=${countryCode}&language_code=${languageCode}`
+    );
   }
 }

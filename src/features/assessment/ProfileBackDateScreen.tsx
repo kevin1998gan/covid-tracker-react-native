@@ -8,12 +8,15 @@ import * as Yup from 'yup';
 import ProgressStatus from '@covid/components/ProgressStatus';
 import Screen, { Header, ProgressBlock } from '@covid/components/Screen';
 import { BrandedButton, ErrorText, HeaderText } from '@covid/components/Text';
-import { ValidationErrors } from '@covid/components/ValidationError';
-import UserService, { isUSCountry } from '@covid/core/user/UserService';
+import { ValidationError } from '@covid/components/ValidationError';
+import { isUSCountry, ICoreService } from '@covid/core/user/UserService';
 import { PatientInfosRequest } from '@covid/core/user/dto/UserAPIContracts';
-import AssessmentCoordinator from '@covid/features/assessment/AssessmentCoordinator';
+import AssessmentCoordinator from '@covid/core/assessment/AssessmentCoordinator';
 import { AtopyData, AtopyQuestions } from '@covid/features/patient/fields/AtopyQuestions';
+import { lazyInject } from '@covid/provider/services';
+import { Services } from '@covid/provider/services.types';
 import i18n from '@covid/locale/i18n';
+import { BloodGroupData, BloodGroupQuestion } from '@covid/features/patient/fields/BloodGroupQuestion';
 
 import { ScreenParamList } from '../ScreenParamList';
 import { BloodPressureData, BloodPressureMedicationQuestion } from '../patient/fields/BloodPressureMedicationQuestion';
@@ -30,6 +33,7 @@ import {
   supplementValues,
   SupplementValue,
 } from '../patient/fields/VitaminQuestion';
+import { DiabetesData, DiabetesQuestions } from '../patient/fields/DiabetesQuestions';
 
 interface BackfillData
   extends BloodPressureData,
@@ -37,7 +41,9 @@ interface BackfillData
     PeriodData,
     HormoneTreatmentData,
     VitaminSupplementData,
-    AtopyData {}
+    AtopyData,
+    DiabetesData,
+    BloodGroupData {}
 
 type BackDateProps = {
   navigation: StackNavigationProp<ScreenParamList, 'ProfileBackDate'>;
@@ -52,6 +58,8 @@ type State = {
   needHormoneTreatmentAnswer: boolean;
   needVitaminAnswer: boolean;
   needAtopyAnswers: boolean;
+  needDiabetesAnswers: boolean;
+  needBloodGroupAnswer: boolean;
 };
 
 const initialState: State = {
@@ -62,10 +70,14 @@ const initialState: State = {
   needHormoneTreatmentAnswer: false,
   needVitaminAnswer: false,
   needAtopyAnswers: false,
+  needDiabetesAnswers: false,
+  needBloodGroupAnswer: false,
 };
 
 export default class ProfileBackDateScreen extends Component<BackDateProps, State> {
-  userService = new UserService();
+  @lazyInject(Services.User)
+  private userService: ICoreService;
+
   features = this.userService.getConfig();
 
   constructor(props: BackDateProps) {
@@ -137,8 +149,7 @@ export default class ProfileBackDateScreen extends Component<BackDateProps, Stat
   });
 
   async componentDidMount() {
-    const userService = new UserService();
-    const features = userService.getConfig();
+    const features = this.userService.getConfig();
     const { currentPatient } = AssessmentCoordinator.assessmentData;
     this.setState({
       needBloodPressureAnswer: !currentPatient.hasBloodPressureAnswer,
@@ -148,17 +159,17 @@ export default class ProfileBackDateScreen extends Component<BackDateProps, Stat
       needHormoneTreatmentAnswer: !currentPatient.hasHormoneTreatmentAnswer,
       needVitaminAnswer: !currentPatient.hasVitaminAnswer,
       needAtopyAnswers: !currentPatient.hasAtopyAnswers,
+      needDiabetesAnswers: currentPatient.shouldAskExtendedDiabetes,
+      needBloodGroupAnswer: !currentPatient.hasBloodGroupAnswer,
     });
   }
 
   handleProfileUpdate(formData: BackfillData) {
     const { currentPatient } = AssessmentCoordinator.assessmentData;
     const patientId = currentPatient.patientId;
-
-    const userService = new UserService();
     const infos = this.createPatientInfos(formData);
 
-    userService
+    this.userService
       .updatePatient(patientId, infos)
       .then((response) => {
         if (formData.race) currentPatient.hasRaceEthnicityAnswer = true;
@@ -168,6 +179,12 @@ export default class ProfileBackDateScreen extends Component<BackDateProps, Stat
         if (formData.vitaminSupplements?.length) currentPatient.hasVitaminAnswer = true;
         if (formData.hasHayfever) currentPatient.hasAtopyAnswers = true;
         if (formData.hasHayfever == 'yes') currentPatient.hasHayfever = true;
+        if (formData.diabetesType) {
+          currentPatient.hasDiabetesAnswers = true;
+          currentPatient.shouldAskExtendedDiabetes = false;
+        }
+        if (formData.bloodGroup) currentPatient.hasBloodGroupAnswer = true;
+
         AssessmentCoordinator.gotoNextScreen(this.props.route.name);
       })
       .catch((err) => {
@@ -255,6 +272,20 @@ export default class ProfileBackDateScreen extends Component<BackDateProps, Stat
       };
     }
 
+    if (this.state.needDiabetesAnswers) {
+      infos = {
+        ...infos,
+        ...DiabetesQuestions.createDTO(formData),
+      };
+    }
+
+    if (this.state.needBloodGroupAnswer) {
+      infos = {
+        ...infos,
+        ...BloodGroupQuestion.createDTO(formData),
+      };
+    }
+
     return infos;
   }
 
@@ -279,8 +310,19 @@ export default class ProfileBackDateScreen extends Component<BackDateProps, Stat
             ...PeriodQuestion.initialFormValues(),
             ...VitaminSupplementsQuestion.initialFormValues(),
             ...AtopyQuestions.initialFormValues(),
+            ...DiabetesQuestions.initialFormValues(),
+            ...BloodGroupQuestion.initialFormValues(),
           }}
-          validationSchema={this.registerSchema}
+          validationSchema={() => {
+            let schema = this.registerSchema;
+            if (this.state.needDiabetesAnswers) {
+              schema = schema.concat(DiabetesQuestions.schema());
+            }
+            if (this.state.needBloodGroupAnswer) {
+              schema = schema.concat(BloodGroupQuestion.schema());
+            }
+            return schema;
+          }}
           onSubmit={(values: BackfillData) => {
             return this.handleProfileUpdate(values);
           }}>
@@ -311,9 +353,17 @@ export default class ProfileBackDateScreen extends Component<BackDateProps, Stat
 
                 {this.state.needAtopyAnswers && <AtopyQuestions formikProps={props as FormikProps<AtopyData>} />}
 
+                {this.state.needDiabetesAnswers && (
+                  <DiabetesQuestions formikProps={props as FormikProps<DiabetesData>} />
+                )}
+
+                {this.state.needBloodGroupAnswer && (
+                  <BloodGroupQuestion formikProps={props as FormikProps<BloodGroupData>} />
+                )}
+
                 <ErrorText>{this.state.errorMessage}</ErrorText>
                 {!!Object.keys(props.errors).length && props.submitCount > 0 && (
-                  <ValidationErrors errors={props.errors as string[]} />
+                  <ValidationError error={i18n.t('validation-error-text')} />
                 )}
 
                 <BrandedButton onPress={props.handleSubmit}>

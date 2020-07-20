@@ -3,20 +3,18 @@ import ApiClient from '@covid/core/api/ApiClient';
 import OfflineService from '@covid/core/offline/OfflineService';
 import PushNotificationService, {
   PushNotificationApiClient,
-} from '@covid/core/pushNotifications/PushNotificationService';
-import UserService from '@covid/core/user/UserService';
+} from '@covid/core/push-notifications/PushNotificationService';
 import ContentService from '@covid/core/content/ContentService';
 import { ContentApiClient } from '@covid/core/content/ContentApiClient';
 
 import { AssessmentApiClient } from './core/assessment/AssessmentApiClient';
 import AssessmentService from './core/assessment/AssessmentService';
 import ReduxAssessmentState from './core/assessment/AssessmentState';
-import ExpoPushTokenEnvironment from './core/pushNotifications/expo';
+import ExpoPushTokenEnvironment from './core/push-notifications/expo';
 
 const apiClient = new ApiClient();
 const localStorageService = new LocalStorageService();
 
-export const userService = new UserService();
 export const offlineService = new OfflineService();
 
 const contentApiClient = new ContentApiClient(apiClient);

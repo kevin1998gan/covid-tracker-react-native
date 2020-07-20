@@ -18,12 +18,18 @@ export type PatientStateType = {
   isSameHousehold: boolean;
   shouldAskLevelOfIsolation: boolean;
   shouldAskStudy: boolean;
+  shouldAskLifestyleQuestion: boolean;
   hasRaceEthnicityAnswer: boolean;
   hasPeriodAnswer: boolean;
   hasHormoneTreatmentAnswer: boolean;
   hasVitaminAnswer: boolean;
   hasAtopyAnswers: boolean;
+  hasDiabetes: boolean;
+  hasDiabetesAnswers: boolean;
+  shouldAskExtendedDiabetes: boolean;
   hasHayfever: boolean;
+  shouldShowUSStudyInvite: boolean;
+  hasBloodGroupAnswer: boolean;
 };
 
 const initPatientState = {
@@ -41,11 +47,17 @@ const initPatientState = {
   isSameHousehold: false,
   shouldAskLevelOfIsolation: false,
   shouldAskStudy: false,
+  shouldAskLifestyleQuestion: false,
   hasRaceEthnicityAnswer: true,
   hasPeriodAnswer: true,
   hasHormoneTreatmentAnswer: true,
   hasVitaminAnswer: true,
   hasAtopyAnswers: true,
+  shouldShowUSStudyInvite: false,
+  hasDiabetes: false,
+  hasDiabetesAnswers: true,
+  shouldAskExtendedDiabetes: false,
+  hasBloodGroupAnswer: true,
 } as Partial<PatientStateType>;
 
 export const getInitialPatientState = (patientId: string): PatientStateType => {

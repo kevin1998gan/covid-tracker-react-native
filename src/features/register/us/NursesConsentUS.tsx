@@ -5,12 +5,13 @@ import { Linking, ScrollView, StyleSheet, View } from 'react-native';
 
 import { colors } from '@theme';
 import i18n from '@covid/locale/i18n';
-import UserService from '@covid/core/user/UserService';
+import { ICoreService } from '@covid/core/user/UserService';
 import { BrandedButton, ClickableText, RegularBoldText, RegularText } from '@covid/components/Text';
 import { CheckboxItem, CheckboxList } from '@covid/components/Checkbox';
-
-import { ScreenParamList } from '../../ScreenParamList';
-import { NursesConsentVersionUS, privacyPolicyVersionUS } from '../constants';
+import { lazyInject } from '@covid/provider/services';
+import { Services } from '@covid/provider/services.types';
+import appConfig from '@covid/appConfig';
+import { ScreenParamList } from '@covid/features/ScreenParamList';
 
 type PropsType = {
   navigation: StackNavigationProp<ScreenParamList, 'NursesConsentUS'>;
@@ -23,7 +24,8 @@ interface TermsState {
 }
 
 export class NursesConsentUSScreen extends Component<PropsType, TermsState> {
-  private userService = new UserService();
+  @lazyInject(Services.User)
+  private userService: ICoreService;
 
   constructor(props: PropsType) {
     super(props);
@@ -45,7 +47,11 @@ export class NursesConsentUSScreen extends Component<PropsType, TermsState> {
 
   handleAgreeClicked = async () => {
     if (this.state.processingChecked && this.state.termsOfUseChecked) {
-      await this.userService.setConsentSigned('US Nurses', NursesConsentVersionUS, privacyPolicyVersionUS);
+      await this.userService.setConsentSigned(
+        'US Nurses',
+        appConfig.nursesConsentVersionUS,
+        appConfig.privacyPolicyVersionUS
+      );
       this.props.navigation.navigate('Register');
     }
   };

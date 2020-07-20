@@ -3,7 +3,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Formik } from 'formik';
 import { Form, Item, Label } from 'native-base';
 import React, { Component } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import * as Yup from 'yup';
 
 import { CheckboxItem, CheckboxList } from '@covid/components/Checkbox';
@@ -12,13 +12,16 @@ import { GenericTextField } from '@covid/components/GenericTextField';
 import ProgressStatus from '@covid/components/ProgressStatus';
 import Screen, { FieldWrapper, Header, ProgressBlock } from '@covid/components/Screen';
 import { BrandedButton, ErrorText, HeaderText, LabelText } from '@covid/components/Text';
-import { ValidationErrors } from '@covid/components/ValidationError';
-import UserService from '@covid/core/user/UserService';
+import { ValidationError } from '@covid/components/ValidationError';
+import { ICoreService } from '@covid/core/user/UserService';
 import { PatientInfosRequest } from '@covid/core/user/dto/UserAPIContracts';
 import i18n from '@covid/locale/i18n';
-import { stripAndRound } from '@covid/utils/helpers';
+import patientCoordinator from '@covid/core/patient/PatientCoordinator';
+import YesNoField from '@covid/components/YesNoField';
+import { lazyInject } from '@covid/provider/services';
+import { Services } from '@covid/provider/services.types';
+import { stripAndRound } from '@covid/utils/number';
 
-import Navigator from '../Navigation';
 import { ScreenParamList } from '../ScreenParamList';
 
 interface YourHealthData {
@@ -75,6 +78,9 @@ const initialState: State = {
 };
 
 export default class PreviousExposureScreen extends Component<HealthProps, State> {
+  @lazyInject(Services.User)
+  private userService: ICoreService;
+
   constructor(props: HealthProps) {
     super(props);
     this.state = initialState;
@@ -105,16 +111,14 @@ export default class PreviousExposureScreen extends Component<HealthProps, State
   });
 
   handleUpdateHealth(formData: YourHealthData) {
-    const currentPatient = this.props.route.params.currentPatient;
+    const currentPatient = patientCoordinator.patientData.currentPatient;
     const patientId = currentPatient.patientId;
-
-    const userService = new UserService();
     const infos = this.createPatientInfos(formData);
 
-    userService
+    this.userService
       .updatePatient(patientId, infos)
       .then((response) => {
-        Navigator.startAssessmentFlow(currentPatient);
+        patientCoordinator.gotoNextScreen(this.props.route.name);
       })
       .catch((err) => {
         this.setState({ errorMessage: i18n.t('something-went-wrong') });
@@ -164,7 +168,7 @@ export default class PreviousExposureScreen extends Component<HealthProps, State
   }
 
   render() {
-    const currentPatient = this.props.route.params.currentPatient;
+    const currentPatient = patientCoordinator.patientData.currentPatient;
     const symptomChangeChoices = [
       { label: i18n.t('past-symptom-changed-much-better'), value: 'much_better' },
       { label: i18n.t('past-symptom-changed-little-better'), value: 'little_better' },
@@ -191,7 +195,7 @@ export default class PreviousExposureScreen extends Component<HealthProps, State
           {(props) => {
             return (
               <Form>
-                <DropdownField
+                <YesNoField
                   selectedValue={props.values.unwellMonthBefore}
                   onValueChange={props.handleChange('unwellMonthBefore')}
                   label={i18n.t('label-unwell-month-before')}
@@ -267,7 +271,7 @@ export default class PreviousExposureScreen extends Component<HealthProps, State
                       keyboardType="numeric"
                     />
 
-                    <DropdownField
+                    <YesNoField
                       selectedValue={props.values.stillHavePastSymptoms}
                       onValueChange={props.handleChange('stillHavePastSymptoms')}
                       label={i18n.t('label-past-symptoms-still-have')}
@@ -286,14 +290,14 @@ export default class PreviousExposureScreen extends Component<HealthProps, State
                   </>
                 )}
 
-                <DropdownField
+                <YesNoField
                   selectedValue={props.values.alreadyHadCovid}
                   onValueChange={props.handleChange('alreadyHadCovid')}
                   label={i18n.t('label-past-symptoms-had-covid')}
                 />
 
                 {props.values.alreadyHadCovid === 'yes' && (
-                  <DropdownField
+                  <YesNoField
                     selectedValue={props.values.classicSymptoms}
                     onValueChange={props.handleChange('classicSymptoms')}
                     label={i18n.t('label-past-symptoms-classic')}
@@ -302,7 +306,7 @@ export default class PreviousExposureScreen extends Component<HealthProps, State
 
                 <ErrorText>{this.state.errorMessage}</ErrorText>
                 {!!Object.keys(props.errors).length && props.submitCount > 0 && (
-                  <ValidationErrors errors={props.errors as string[]} />
+                  <ValidationError error={i18n.t('validation-error-text')} />
                 )}
 
                 <BrandedButton onPress={props.handleSubmit}>{i18n.t('next-question')}</BrandedButton>

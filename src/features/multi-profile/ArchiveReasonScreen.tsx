@@ -2,12 +2,14 @@ import React from 'react';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { HeaderText, RegularBoldText, RegularText, SecondaryText } from '@covid/components/Text';
+import { HeaderText, RegularText, SecondaryText } from '@covid/components/Text';
 import Screen, { FieldWrapper, Header } from '@covid/components/Screen';
 import { BigButton } from '@covid/components/BigButton';
 import i18n from '@covid/locale/i18n';
-import UserService from '@covid/core/user/UserService';
-import Navigator from '@covid/features/Navigation';
+import { ICoreService } from '@covid/core/user/UserService';
+import appCoordinator from '@covid/features/AppCoordinator';
+import { useInjection } from '@covid/provider/services.hooks';
+import { Services } from '@covid/provider/services.types';
 
 import { ScreenParamList } from '../ScreenParamList';
 
@@ -17,6 +19,7 @@ type RenderProps = {
 };
 
 export const ArchiveReasonScreen: React.FC<RenderProps> = (props) => {
+  const userService = useInjection<ICoreService>(Services.User);
   const reasons = [
     {
       text: i18n.t('archive-reason.choice-duplicate-account'),
@@ -50,9 +53,8 @@ export const ArchiveReasonScreen: React.FC<RenderProps> = (props) => {
       archived_reason: reason,
     };
 
-    const userService = new UserService();
     userService.updatePatient(props.route.params.profileId, infos).then((response) => {
-      Navigator.gotoScreen('SelectProfile');
+      appCoordinator.gotoNextScreen(props.route.name);
     });
   }
 

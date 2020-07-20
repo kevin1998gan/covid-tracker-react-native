@@ -6,10 +6,11 @@ import DropdownField from '@covid/components/DropdownField';
 import { FieldWrapper } from '@covid/components/Screen';
 import { ValidatedTextInput } from '@covid/components/ValidatedTextInput';
 import { ValidationError } from '@covid/components/ValidationError';
-import { isUSCountry } from '@covid/core/user/UserService';
+import { isUSCountry, ICoreService } from '@covid/core/user/UserService';
 import i18n from '@covid/locale/i18n';
-import { userService } from '@covid/Services';
 import { RegularText } from '@covid/components/Text';
+import { container } from '@covid/provider/services';
+import { Services } from '@covid/provider/services.types';
 
 export interface WeightData {
   weight: string;
@@ -24,12 +25,13 @@ interface FCWithStatic<P> extends React.FC<P> {
 
 interface Props {
   formikProps: FormikProps<WeightData>;
+  label: string;
 }
 
-export const WeightQuestion: FCWithStatic<Props> = ({ formikProps }) => {
+export const WeightQuestion: FCWithStatic<Props> = ({ formikProps, label }) => {
   return (
     <FieldWrapper style={styles.fieldWrapper}>
-      <RegularText>{i18n.t('your-weight')}</RegularText>
+      <RegularText>{label}</RegularText>
       {isUSCountry() ? (
         <ValidatedTextInput
           placeholder={i18n.t('placeholder-pounds')}
@@ -58,7 +60,7 @@ export const WeightQuestion: FCWithStatic<Props> = ({ formikProps }) => {
             </View>
           ) : (
             <View style={styles.primaryFieldRow}>
-              <View style={styles.tertiaryField}>
+              <View style={styles.stonesField}>
                 <ValidatedTextInput
                   placeholder={i18n.t('placeholder-stones')}
                   value={formikProps.values.stones}
@@ -70,7 +72,7 @@ export const WeightQuestion: FCWithStatic<Props> = ({ formikProps }) => {
                   keyboardType="numeric"
                 />
               </View>
-              <View style={styles.tertiaryField}>
+              <View style={styles.poundsField}>
                 <ValidatedTextInput
                   placeholder={i18n.t('placeholder-pounds')}
                   value={formikProps.values.pounds}
@@ -108,7 +110,7 @@ export const WeightQuestion: FCWithStatic<Props> = ({ formikProps }) => {
 };
 
 WeightQuestion.initialFormValues = () => {
-  const features = userService.getConfig();
+  const features = container.get<ICoreService>(Services.User).getConfig();
   return {
     weight: '',
     stones: '',
@@ -143,6 +145,16 @@ const styles = StyleSheet.create({
   tertiaryField: {
     flex: 5,
     marginRight: 8,
+  },
+
+  stonesField: {
+    flex: 5,
+    marginRight: 4,
+  },
+
+  poundsField: {
+    flex: 5,
+    marginLeft: 4,
   },
 
   secondaryField: {

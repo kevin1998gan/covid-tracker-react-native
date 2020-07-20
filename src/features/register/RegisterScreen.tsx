@@ -9,13 +9,15 @@ import * as Yup from 'yup';
 
 import { colors } from '@theme';
 import i18n from '@covid/locale/i18n';
-import UserService from '@covid/core/user/UserService';
+import { ICoreService } from '@covid/core/user/UserService';
 import Analytics, { events } from '@covid/core/Analytics';
 import { ValidatedTextInput } from '@covid/components/ValidatedTextInput';
 import { BrandedButton, ClickableText, ErrorText, HeaderLightText, RegularText } from '@covid/components/Text';
 import { Field, FieldError } from '@covid/components/Forms';
+import { lazyInject } from '@covid/provider/services';
+import { Services } from '@covid/provider/services.types';
 
-import Navigator from '../Navigation';
+import appCoordinator from '../AppCoordinator';
 import { ScreenParamList } from '../ScreenParamList';
 
 type PropsType = {
@@ -46,12 +48,14 @@ const initialRegistrationValues = {
 };
 
 export class RegisterScreen extends Component<PropsType, State> {
+  @lazyInject(Services.User)
+  private userService: ICoreService;
+
   private passwordComponent: any;
 
   constructor(props: PropsType) {
     super(props);
     this.state = initialState;
-    Navigator.setNavigation(this.props.navigation);
   }
 
   private checkFieldsFilled = (props: any) => {
@@ -62,15 +66,15 @@ export class RegisterScreen extends Component<PropsType, State> {
   private handleCreateAccount(formData: RegistrationData) {
     if (this.state.enableSubmit) {
       this.setState({ enableSubmit: false }); // Stop resubmissions
-      const userService = new UserService(); // todo get gloval var
-      userService
+      this.userService
         .register(formData.email, formData.password)
-        .then((response) => {
+        .then(async (response) => {
           const isTester = response.data.user.is_tester;
           Analytics.identify({ isTester });
           Analytics.track(events.SIGNUP);
           const patientId = response.data.user.patients[0];
-          Navigator.gotoNextScreen(this.props.route.name, { patientId });
+          await appCoordinator.setPatientId(patientId);
+          appCoordinator.gotoNextScreen(this.props.route.name);
         })
         .catch((err: AxiosError) => {
           // TODO - These error messages are misleading and we could display what the server sends back

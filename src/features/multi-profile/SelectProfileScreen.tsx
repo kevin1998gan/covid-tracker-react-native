@@ -10,14 +10,17 @@ import { Header } from '@covid/components/Screen';
 import { HeaderText, SecondaryText } from '@covid/components/Text';
 import { ApiErrorState, initialErrorState } from '@covid/core/api/ApiServiceErrors';
 import i18n from '@covid/locale/i18n';
-import { offlineService, userService } from '@covid/Services';
+import { offlineService } from '@covid/Services';
 import { DrawerToggle } from '@covid/components/DrawerToggle';
 import { ProfileCard } from '@covid/components/ProfileCard';
 import { NewProfileCard } from '@covid/components/NewProfileCard';
 import { DEFAULT_PROFILE } from '@covid/utils/avatar';
+import { lazyInject } from '@covid/provider/services';
+import { Services } from '@covid/provider/services.types';
+import { ICoreService } from '@covid/core/user/UserService';
 
 import { ScreenParamList } from '../ScreenParamList';
-import Navigator from '../Navigation';
+import appCoordinator from '../AppCoordinator';
 
 type RenderProps = {
   navigation: DrawerNavigationProp<ScreenParamList, 'SelectProfile'>;
@@ -50,6 +53,9 @@ const initialState = {
 };
 
 export default class SelectProfileScreen extends Component<RenderProps, State> {
+  @lazyInject(Services.User)
+  private userService: ICoreService;
+
   constructor(props: RenderProps) {
     super(props);
     this.state = initialState;
@@ -74,7 +80,7 @@ export default class SelectProfileScreen extends Component<RenderProps, State> {
   async listProfiles() {
     this.setState({ status: i18n.t('errors.status-loading'), error: null });
     try {
-      const response = await userService.listPatients();
+      const response = await this.userService.listPatients();
       response &&
         this.setState({
           profiles: response.data,
@@ -87,9 +93,9 @@ export default class SelectProfileScreen extends Component<RenderProps, State> {
 
   async profileSelected(profileId: string, index: number) {
     try {
-      const currentPatient = await userService.getCurrentPatient(profileId);
+      const currentPatient = await this.userService.getPatientState(profileId);
       this.setState({ isApiError: false });
-      await Navigator.profileSelected(index === 0, currentPatient);
+      await appCoordinator.profileSelected(index === 0, currentPatient);
     } catch (error) {
       this.setState({
         isApiError: true,
@@ -118,12 +124,12 @@ export default class SelectProfileScreen extends Component<RenderProps, State> {
   }
 
   gotoCreateProfile() {
-    this.props.navigation.navigate('CreateProfile', { avatarName: this.getNextAvatarName() });
+    appCoordinator.goToCreateProfile(this.getNextAvatarName());
   }
 
   render() {
     return (
-      <View style={styles.view}>
+      <View>
         <SafeAreaView>
           {this.state.isApiError && (
             <LoadingModal
@@ -137,8 +143,8 @@ export default class SelectProfileScreen extends Component<RenderProps, State> {
             <View style={styles.rootContainer}>
               <DrawerToggle navigation={this.props.navigation} style={{ tintColor: colors.primary }} />
 
-              <Header style={styles.headerContainer}>
-                <HeaderText style={{ marginBottom: 12 }}>{i18n.t('select-profile-title')}</HeaderText>
+              <Header>
+                <HeaderText style={{ marginBottom: 12, paddingRight: 24 }}>{i18n.t('select-profile-title')}</HeaderText>
                 <SecondaryText>{i18n.t('select-profile-text')}</SecondaryText>
               </Header>
 
@@ -190,16 +196,12 @@ const styles = StyleSheet.create({
 
   cardContainer: {
     width: '45%',
-    margin: 5,
-  },
-
-  view: {
-    backgroundColor: colors.backgroundSecondary,
+    marginHorizontal: 8,
+    marginVertical: 4,
   },
 
   scrollView: {
     flexGrow: 1,
-    backgroundColor: colors.backgroundSecondary,
     justifyContent: 'space-between',
   },
 

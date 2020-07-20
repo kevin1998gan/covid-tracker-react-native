@@ -33,14 +33,6 @@ export const Header = (props: HeaderProp) => {
   return <View style={[styles.headerBlock, props.style]}>{props.children}</View>;
 };
 
-type OverviewProp = {
-  children: React.ReactNode;
-};
-
-export const Overview = (props: OverviewProp) => {
-  return <View style={styles.overviewBlock}>{props.children}</View>;
-};
-
 type ProgressBlockType = {
   children: React.ReactNode;
 };
@@ -93,8 +85,6 @@ export default class Screen extends Component<ScreenProps> {
             <View style={styles.pageBlock}>{this.props.children}</View>
           </ScrollView>
         </KeyboardAvoidingView>
-
-        {/* TODO: Put any fixed footer component */}
       </SafeAreaView>
     );
   }
@@ -103,7 +93,7 @@ export default class Screen extends Component<ScreenProps> {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: colors.white,
+    backgroundColor: colors.backgroundPrimary,
   },
 
   statusBarBlock: {
@@ -118,11 +108,6 @@ const styles = StyleSheet.create({
   headerBlock: {
     marginVertical: 16,
     // marginHorizontal: 16,
-  },
-
-  overviewBlock: {
-    marginVertical: 16,
-    marginHorizontal: 16,
   },
 
   progressBlock: {

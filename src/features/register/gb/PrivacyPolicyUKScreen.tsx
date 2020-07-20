@@ -5,10 +5,9 @@ import { Linking, ScrollView, StyleSheet, View } from 'react-native';
 
 import { colors } from '@theme';
 import { BrandedButton, ClickableText, RegularBoldText, RegularText } from '@covid/components/Text';
-import { ApplicationVersion } from '@covid/components/AppVersion';
 
 import { ScreenParamList } from '../../ScreenParamList';
-import { BulletedTextBlock } from '../LegalComponents';
+import { BulletedTextBlock } from '../../../components/LegalComponents';
 
 type PropsType = {
   navigation: StackNavigationProp<ScreenParamList, 'PrivacyPolicyUK'>;
@@ -208,8 +207,6 @@ export class PrivacyPolicyUKScreen extends Component<PropsType, object> {
             Back
           </BrandedButton>
         )}
-
-        <ApplicationVersion />
       </View>
     );
   }

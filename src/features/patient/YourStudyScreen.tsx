@@ -12,10 +12,13 @@ import { GenericTextField } from '@covid/components/GenericTextField';
 import ProgressStatus from '@covid/components/ProgressStatus';
 import Screen, { FieldWrapper, Header, ProgressBlock } from '@covid/components/Screen';
 import { BrandedButton, ErrorText, HeaderText, RegularText, LabelText } from '@covid/components/Text';
-import { ValidationErrors } from '@covid/components/ValidationError';
-import UserService, { isGBCountry, isUSCountry } from '@covid/core/user/UserService';
+import { ValidationError } from '@covid/components/ValidationError';
+import UserService, { isGBCountry, isUSCountry, ICoreService } from '@covid/core/user/UserService';
 import { PatientInfosRequest } from '@covid/core/user/dto/UserAPIContracts';
 import i18n from '@covid/locale/i18n';
+import patientCoordinator from '@covid/core/patient/PatientCoordinator';
+import { lazyInject } from '@covid/provider/services';
+import { Services } from '@covid/provider/services.types';
 
 import { ScreenParamList } from '../ScreenParamList';
 
@@ -206,9 +209,17 @@ const AllCohorts: CohortDefinition[] = [
     label: 'NorthShore Genomic Health Initiative',
     country: 'US',
   },
+  {
+    key: 'is_in_us_c19_human_genetics',
+    label: 'C19 Human Genetics Study',
+    country: 'US',
+  },
 ];
 
 export default class YourStudyScreen extends Component<YourStudyProps, State> {
+  @lazyInject(Services.User)
+  private userService: ICoreService;
+
   registerSchema = Yup.object().shape({
     clinicalStudyNames: Yup.string(),
     clinicalStudyContact: Yup.string(),
@@ -242,21 +253,20 @@ export default class YourStudyScreen extends Component<YourStudyProps, State> {
   }
 
   handleSubmit(formData: YourStudyData) {
-    const currentPatient = this.props.route.params.currentPatient;
+    const currentPatient = patientCoordinator.patientData.currentPatient;
     const patientId = currentPatient.patientId;
-    const userService = new UserService();
     const infos = this.createPatientInfos(formData);
 
-    userService
+    this.userService
       .updatePatient(patientId, infos)
       .then((response) => {
-        this.props.navigation.navigate('YourWork', { currentPatient });
+        patientCoordinator.gotoNextScreen(this.props.route.name);
       })
       .catch((err) => this.setState({ errorMessage: i18n.t('something-went-wrong') }));
   }
 
   render() {
-    const currentPatient = this.props.route.params.currentPatient;
+    const currentPatient = patientCoordinator.patientData.currentPatient;
 
     return (
       <Screen profile={currentPatient.profile} navigation={this.props.navigation}>
@@ -331,7 +341,7 @@ export default class YourStudyScreen extends Component<YourStudyProps, State> {
 
                 <ErrorText>{this.state.errorMessage}</ErrorText>
                 {!!Object.keys(props.errors).length && props.submitCount > 0 && (
-                  <ValidationErrors errors={props.errors} />
+                  <ValidationError error={i18n.t('validation-error-text')} />
                 )}
 
                 <BrandedButton onPress={props.handleSubmit}>{i18n.t('next-question')}</BrandedButton>

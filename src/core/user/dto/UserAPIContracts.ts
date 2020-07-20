@@ -35,6 +35,23 @@ export enum PatientInteractions {
   NO = 'no',
 }
 
+export enum CovidTestMechanismOptions {
+  NOSE_SWAB = 'nose_swab', // Deprecated
+  THROAT_SWAB = 'throat_swab', // Deprecated
+  NOSE_OR_THROAT_SWAB = 'nose_throat_swab',
+  SPIT_TUBE = 'spit_tube',
+  BLOOD_SAMPLE = 'blood_sample', // Deprecated
+  BLOOD_FINGER_PRICK = 'blood_sample_finger_prick',
+  BLOOD_NEEDLE_DRAW = 'blood_sample_needle_draw',
+  OTHER = 'other',
+}
+
+export enum CovidTestTrainedWorkerOptions {
+  TRAINED = 'trained',
+  UNTRAINED = 'untrained',
+  UNSURE = 'unsure',
+}
+
 export type LoginOrRegisterResponse = {
   key: string; // auth token
   user: UserResponse;
@@ -88,6 +105,7 @@ export type PatientInfosRequest = {
   smoked_years_ago: number;
   has_kidney_disease: boolean;
   limited_activity: boolean;
+  blood_group: string;
 
   // Cancer questions
   has_cancer: boolean;
@@ -159,6 +177,7 @@ export type PatientInfosRequest = {
   race_other: string;
   ethnicity: string;
   last_asked_level_of_isolation: Date;
+  should_ask_lifestyle_questions: boolean;
 
   // period fields
   period_status: string;
@@ -190,6 +209,31 @@ export type PatientInfosRequest = {
   vs_pftns: boolean;
   vs_other: string;
   vs_asked_at: Date;
+
+  contact_additional_studies: boolean;
+
+  // Diabetes fields
+  diabetes_type: string;
+  diabetes_type_other: string;
+  a1c_measurement_percent: number;
+  a1c_measurement_mmol: number;
+  diabetes_diagnosis_year: number;
+  diabetes_treatment_none: boolean;
+  diabetes_treatment_lifestyle: boolean;
+  diabetes_treatment_basal_insulin: boolean;
+  diabetes_treatment_rapid_insulin: boolean;
+  diabetes_treatment_insulin_pump: boolean;
+  diabetes_treatment_other_injection: boolean;
+  diabetes_treatment_other_oral: boolean;
+  diabetes_treatment_pfnts: boolean;
+  diabetes_oral_biguanide: boolean;
+  diabetes_oral_sulfonylurea: boolean;
+  diabetes_oral_dpp4: boolean;
+  diabetes_oral_meglitinides: boolean;
+  diabetes_oral_thiazolidinediones: boolean;
+  diabetes_oral_sglt2: boolean;
+  diabetes_oral_other_medication: string;
+  diabetes_uses_cgm: boolean;
 };
 
 export type TokenInfoRequest = {
@@ -229,6 +273,7 @@ export type StartupInfo = {
   ip_country: string;
 };
 
-export type AskValidationStudy = {
+export type AskForStudies = {
   should_ask_uk_validation_study: boolean;
+  should_ask_uk_vaccine_register: boolean;
 };

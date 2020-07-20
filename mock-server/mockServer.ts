@@ -1,5 +1,5 @@
 import mockDb from './mockDb';
-import { Patient, Assessment } from './types';
+import { Patient, Assessment, Lifestyle } from './types';
 import express = require('express');
 import bodyParser = require('body-parser');
 import uuid = require('uuid');
@@ -155,6 +155,23 @@ app.get('/area_stats/', (_, res) => {
   });
 });
 
+app.get('/text/list/', (_, res) => {
+  return res.status(200).send({
+    ThankYou: null,
+    Welcome: null,
+    WelcomeRepeat: {
+      title_text: 'RESEARCH',
+      body_text: 'Follow the discoveries \\nyou made possible"',
+      body_link: 'https://www.youtube.com/watch?v=oHg5SJYRHA0',
+      link_text: 'Visit the website',
+      body_photo: null,
+      experiment_name: null,
+      cohort_id: null,
+      analytics: null,
+    },
+  });
+});
+
 /**
  * Patient
  */
@@ -193,6 +210,18 @@ app.post('/patients/', (req, res) => {
 app.get('/patient_list/', (_, res) => {
   res.header('Content-type', 'application/json');
   return res.send(db.patients.get());
+});
+
+/**
+ * Lifestyle
+ */
+
+app.post('/lifestyles/', (req, res) => {
+  const { body: lifestyle } = req as { body: Lifestyle };
+  const id = uuid.v1();
+
+  res.header('Content-type', 'application/json');
+  return res.send(db.lifestyles.save(id, { ...lifestyle, id }));
 });
 
 /**

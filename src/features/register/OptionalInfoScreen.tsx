@@ -14,9 +14,12 @@ import { ApiErrorState, initialErrorState } from '@covid/core/api/ApiServiceErro
 import { ValidatedTextInput } from '@covid/components/ValidatedTextInput';
 import { BrandedButton, ErrorText, HeaderText, RegularText } from '@covid/components/Text';
 import { LoadingModal } from '@covid/components/Loading';
-import { userService, offlineService, pushNotificationService } from '@covid/Services';
+import { offlineService, pushNotificationService } from '@covid/Services';
+import { lazyInject } from '@covid/provider/services';
+import { Services } from '@covid/provider/services.types';
+import { ICoreService } from '@covid/core/user/UserService';
 
-import Navigator from '../Navigation';
+import appCoordinator from '../AppCoordinator';
 import { ScreenParamList } from '../ScreenParamList';
 
 type PropsType = {
@@ -39,17 +42,14 @@ interface OptionalInfoData {
 }
 
 export class OptionalInfoScreen extends Component<PropsType, State> {
+  @lazyInject(Services.User)
+  private userService: ICoreService;
+
   private phoneComponent: any;
 
   constructor(props: PropsType) {
     super(props);
     this.state = initialState;
-  }
-
-  private async gotoNextScreen(patientId: string) {
-    const currentPatient = await userService.getCurrentPatient(patientId);
-    this.setState({ isApiError: false });
-    Navigator.gotoNextScreen(this.props.route.name, { currentPatient });
   }
 
   private async setPushToken() {
@@ -66,16 +66,16 @@ export class OptionalInfoScreen extends Component<PropsType, State> {
         ...(formData.name && { name: formData.name }),
         ...(formData.phone && { phone_number: formData.phone }),
       } as Partial<PiiRequest>;
-      await userService.updatePii(piiDoc);
+      await this.userService.updatePii(piiDoc);
     }
   }
 
   private async handleSaveOptionalInfos(formData: OptionalInfoData) {
     try {
-      const patientId = this.props.route.params.patientId;
       await this.setPushToken();
       await this.savePiiData(formData);
-      await this.gotoNextScreen(patientId);
+      this.setState({ isApiError: false });
+      appCoordinator.gotoNextScreen(this.props.route.name);
     } catch (error) {
       this.setState({
         isApiError: true,

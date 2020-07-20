@@ -103,6 +103,8 @@
 
   "picker-yes": "Ja",
   "picker-no": "Nej",
+  "picker-unsure": "Osäker",
+  "please-select-option": "Välj ett alternativ",
   "placeholder-optional-question": "*Optional",
   "placeholder-optional": "Valfri",
 
@@ -269,6 +271,11 @@
     "page-title-detail-update": "Uppdatera test",
     "add-test": "Lägg till test",
     "update-test": "Uppdatera test",
+
+    "delete-test": "Ta bort testet",
+    "delete-test-alert-title": "Ta bort testet?",
+    "delete-test-alert-text": "Informationen kommer att gå förlorad. Vill du fortsätta?",
+
     "question-select-a-date-range": "Välj ett datumintervall",
     "question-select-a-date": "Välj ett datum",
 
@@ -278,24 +285,39 @@
     "picker-nose-throat-swab": "En testpinne i näsan eller svalget",
     "picker-saliva-sample": "Jag spottade i en kopp/ett rör",
     "picker-blood-sample": "Jag lämnade ett blodprov",
+    "picker-finger-prick": "Blodprov via ett stick i fingret",
+    "picker-blood-draw": "Blodprov med hjälp av en nål",
     "picker-other": "Annat sätt, ange vilket",
 
     "question-mechanism-specify": "Ange hur testet utfördes:",
+    "question-trained-worker": "Utfördes testet av utbildad personal?",
 
-    "question-result": "Var ditt test för COVID-19 positivt?",
+    "location": {
+      "question": "Var utfördes testet?",
+      "specify": "Por favor especifique",
+      "answers": {
+        "at-home": "Hemma",
+        "drive-through-rtc": "",
+        "drop-in-facility": "Drop-in testcenter",
+        "hospital": "Sjukhus",
+        "gp": "Vårdcentral",
+        "chemist-pharmacy": "Apotek",
+        "store-pharmacy": "Tienda o farmacia clínica",
+        "work": "På arbetsplatsen (undantaget sjukhus och vårdcentral)",
+        "local-health-department": "",
+        "other": "Annat, ange"
+      }
+    },
 
+    "question-result": "Vad visar provsvaret?",
+    "picker-positive": "Positivt",
+    "picker-negative": "Negativt",
     "picker-waiting": "Väntar på mina resultat",
-    "picker-test-failed": "Inkonklusivt/provtagning misslyckades",
+    "picker-test-failed": "Inkonklusivt / provtagning misslyckades",
 
     "question-knows-date-of-test": "Vet du vilket datum du testades?",
     "question-date-test-occurred": "När testades du?",
-
     "question-date-test-occurred-guess": "Mellan vilka två datum tror du att testet utfördes?",
-    "picker-less-than-7-days-ago": "För mindre än sju dagar sedan",
-    "picker-over-1-week-ago": "Över en vecka sedan",
-    "picker-over-2-week-ago": "Över två veckor sedan",
-    "picker-over-3-week-ago": "Över tre veckor sedan",
-    "picker-over-1-month-ago": "Över en månad sedan",
 
     "required-date": "Ange datum när testet utfördes",
     "required-dates": "Ange mellan vilka två datum testet utfördes",
@@ -446,9 +468,9 @@
     "button-text": "Dela appen"
   },
 
-  "thank-you-title": "Stort tack för din hjälp och ditt värdefulla bidrag till forskningen.",
+  "thank-you-title": "Tack för att du fortsätter rapportera!",
   "blog-link": "https://covid19app.lu.se/",
-  "thank-you-body": "Tack, du är nu en av de miljontals människor som hjälper forskare på Lunds universitet och King’s College London att bekämpa COVID-19.",
+  "thank-you-body": "Även om restriktionerna har lättat är ditt deltagande viktigare än någonsin i kampen mot covid-19.",
   "check-in-tomorrow": "Om du har möjlighet uppskattar vi verkligen om du rapporterar hur du mår igen i morgon.",
   "check-news-feed": "Håll gärna utkik efter uppdateringar i vårt <b>nyhetsflöde</b>.",
   "faq-link": "https://www.covid19app.lu.se/faq",
@@ -471,6 +493,7 @@
   "delete-my-data": "Ta bort mina uppgifter",
   "delete-data-alert-title": "Är du säker?",
   "delete-data-alert-text": "Du kan inte ångra dig om du tar bort ditt konto och dina uppgifter.",
+  "push-notifications": "Slå på påminnelser",
   "cancel": "Avbryt",
   "delete": "Ta bort",
   "logout": "Logga ut",
@@ -523,23 +546,24 @@
   "choose-one-of-these-options": "Välj ett av alternativen",
   "prefer-not-to-say": "Föredrar att inte svara",
 
-  "validation-error-text": "Fyll i eller korrigera informationen ovan: %{info}",
-  "validation-error-text-no-info": "Fyll i eller korrigera informationen ovan",
+  "validation-error-text": "Fyll i eller korrigera informationen ovan",
 
   "website-home": "https://covid.joinzoe.com/",
 
   "back-date-profile-title": "Några fler frågor om dig",
   "update-profile": "Uppdatera profilen",
 
-  "add-new-test": "Lägg till nytt test",
-  "your-covid-tests": "Dina covid-19-tester",
-  "positive": "Positivt",
-  "negative": "Negativt",
-  "failed": "Misslyckades",
-  "pending": "Väntar",
-  "please-add-test-below": "Om du har gjort ett covid-19-test någon gång, lägg till det nedan. Detta innefattar PCR (näsa/svalg/saliv) och antikroppstester (blodprover). Du kan redigera dessa när som helst i framtiden.",
-  "never-had-test": "Jag har aldrig testats för covid-19",
-  "above-list-correct": "Listan ovan är korrekt",
+  "covid-test-list": {
+    "title": "Dina covid-19-tester",
+    "text": "Om du har gjort ett covid-19-test någon gång, lägg till det nedan. Detta innefattar PCR (näsa/svalg/saliv) och antikroppstester (blodprover). Du kan redigera dessa när som helst i framtiden.",
+    "add-new-test": "Lägg till nytt test",
+    "positive": "Positivt",
+    "negative": "Negativt",
+    "failed": "Misslyckades",
+    "pending": "Väntar",
+    "never-had-test": "Jag har aldrig testats för covid-19",
+    "above-list-correct": "Listan ovan är korrekt"
+  },
 
   "errors": {
     "button-retry": "Försök igen",
@@ -660,6 +684,10 @@
       "uni-hospital": false,
       "nct-number": false,
       "if-not": false
+    },
+
+    "covid-test": {
+      "question-invite-to-test": false
     },
 
     "partners": {
@@ -890,6 +918,121 @@
       "choice-other": false,
       "choice-pfnts": false,
       "choice-passed-away": false
+    },
+
+    "us-study-invite": {
+      "title": false,
+      "body": false,
+      "button": false
+    },
+
+    "vaccine-registry": {
+      "covid-prevention": false,
+      "can-we-contact": false,
+      "yes": false,
+      "no": false,
+      "next": false,
+      "creating-registry": false,
+      "not-ourselves": false,
+      "not-share": false,
+      "prioritise": false,
+      "tell-friends": false,
+      "share-title": false,
+      "share-text": false,
+      "callout-title": false,
+      "callout-text": false,
+      "callout-link-text": false,
+      "menu-item": false
+    }
+  },
+
+  "diabetes": {
+    "justification": "Du angav tidigare att du har diabetes, vilket är en viktig riskfaktor för covid-19. Våra forskare har några uppföljande frågor för att de ska förstå mer om detta. Alla frågor är helt frivilliga.",
+    "which-type": "Vilken typ av diabetes har du?",
+    "answer-type-1": "Diabetes typ 1",
+    "answer-type-2": "Diabetes typ 2",
+    "answer-gestational": "Graviditetsdiabetes",
+    "answer-unsure": "Osäker",
+    "answer-other": "Annan typ, ange vilken-",
+    "most-recent-hemoglobin-measure": "Vad var ditt senaste HbA1c? ",
+    "hemoglobin-measurement-unit-percent": "%",
+    "hemoglobin-measurement-unit-mol": "mmol/mol",
+    "when-was-diagnosed": "Vilket år blev du diagnosticerad?",
+    "which-treatment": "Vilken diabetesbehandling har du? Markera alla som stämmer för dig:",
+    "answer-none": "Ingen",
+    "answer-lifestyle-mod": "Enbart livsstilsförändring (t.ex. fysisk aktivitet, kostomläggning eller viktnedgång)",
+    "answer-daily-injections": "Långverkande insulin/basinsulin eller mixinsulin (t.ex. Lantus®, Toujeo®, Levemir®, Tresiba®, Insulatard® eller Novomix®)",
+    "answer-rapid-injections": "Snabbverkande insulin (t.ex. Novorapid®, Humalog®, Fiasp®, Actrapid® eller Apidra®) som ges som måltidsinuslin och/eller hyperglykemi",
+    "answer-insulin-pump": "Kontinuerlig infusion med en insulinpump",
+    "answer-non-insulin-injections": "Injektioner med GLP-1-analog (t.ex. Victoza®, Xultophy®, Ozempic® eller Trulicity®) ",
+    "answer-other-oral-meds": "Tablettbehandling",
+    "which-oral-treatment": "Vilka läkemedel som tas oralt tar du för din diabetes? Markera alla alternativ som stämmer för dig",
+    "answer-oral-biguanide": "Metformin (t.ex. Metformin®, Janumet® eller Glucophage®)",
+    "answer-sulfonylurea": "Sulfonylurea (t.ex. Mindiab®, Daonil®, Glibenklamid® eller Glimepirid®)",
+    "answer-dpp": "DPP-4-hämmare (t.ex. Januvia®, Onglyza® eller Trajenta®)",
+    "answer-meglitinides": "Meglitinider (t.ex. NovoNorm® eller Repaglinid®)",
+    "answer-thiazolidinediones": "Glitazoner (t.ex. Actos® eller Pioglitazone®)",
+    "answer-sglt": "SGLT-2-hämmare (t.ex. Jardiance®, Forxiga®, Steglatro® eller Invokana®)",
+    "answer-other-oral-meds-not-listed": "Annan sorts tabletter som inte finns med i listan",
+    "please-specify-other-oral-meds": "Ange vilka läkemedel du tar oralt",
+    "please-select-diabetes-type": "Välj ett alternativ",
+    "please-select-diabetes-treatment": "Välj ett eller flera av alternativen ovan",
+    "question-use-cgm": "Använder du en kontinuerlig glukosmonitor (CGM)?"
+  },
+
+  "lifestyle": {
+    "title": "Kost & livsstil",
+    "explanation": "Följande frågor om vikt, kost och fysisk aktivitet ska hjälpa oss att förstå om covid-19 eventuellt påverkar din hälsa inom dessa områden och hur betydande dessa effekter är. Det är helt frivilligt att svara på frågorna.",
+    "text": "Sedan mars månad när covid-19 blev allmänt förekommande i samhället:",
+    "please-select-option": "Välj ett alternativ",
+    "weight-change": {
+      "question": "Hur har din vikt förändrats?",
+      "increased": "Ökat",
+      "decreased": "Minskat",
+      "same": "Oförändrad",
+      "unsure-pfnts": "Osäker / Föredrar att inte berätta"
+    },
+    "weight-difference": "Med hur mycket (en uppskattning räcker)?",
+    "diet-change": {
+      "question": "Hur tycker du att din kost har förändrats?",
+      "increased": "Den har blivit hälsosammare",
+      "decreased": "Den har blivit ohälsosammare",
+      "same": "Den är oförändrad",
+      "unsure-pfnts": "Osäker / Föredrar att inte berätta"
+    },
+    "snacking-change": {
+      "question": "Hur har ditt småätande förändrats?",
+      "increased": "Jag småäter mer (snacks)",
+      "decreased": "Jag småäter mindre (snacks)",
+      "same": "Jag småäter lika mycket som innan",
+      "unsure-pfnts": "Osäker / Föredrar att inte berätta"
+    },
+    "alcohol-change": {
+      "question": "Hur har din alkoholkonsumtion förändrats?",
+      "increased": "Jag dricker mer alkohol",
+      "decreased": "Jag dricker mindre alkohol",
+      "no-alcohol": "Jag dricker inte alkohol",
+      "same": "Min alkoholkonsumtion är oförändrad",
+      "unsure-pfnts": "Osäker / Föredrar att inte berätta"
+    },
+    "activity-change": {
+      "question": "Har dina nivåer av fysisk aktivitet förändrats?",
+      "increased": "Ja, ökat",
+      "decreased": "Ja, minskat",
+      "same": "Ingen förändring, oförändrade",
+      "unsure-pfnts": "Osäker / Föredrar att inte berätta"
+    }
+  },
+  "blood-group": {
+    "justification": "Vi frågar detta då andra studier har visat att vilken blodgrupp man har kan påverka både risken att drabbas av covid-19 samt hur allvarligt sjuk man blir. Vi vill undersöka detta i vår stora deltagargrupp.",
+    "question": "Känner du till vilken blodgrupp du har? Vilken?",
+    "answers": {
+      "type-a": "A",
+      "type-b": "B",
+      "type-ab": "AB",
+      "type-o": "O",
+      "dont-know": "Jag är inte helt säker på vilken blodgrupp jag har",
+      "pfnts": "Föredrar att inte berätta"
     }
   }
 }

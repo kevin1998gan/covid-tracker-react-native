@@ -1,7 +1,7 @@
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Formik, FormikProps } from 'formik';
-import { Form, Item, Label, Text } from 'native-base';
+import { Form, Text } from 'native-base';
 import React, { Component } from 'react';
 import { StyleSheet } from 'react-native';
 import * as Yup from 'yup';
@@ -9,15 +9,17 @@ import * as Yup from 'yup';
 import DropdownField from '@covid/components/DropdownField';
 import { GenericTextField } from '@covid/components/GenericTextField';
 import ProgressStatus from '@covid/components/ProgressStatus';
-import Screen, { FieldWrapper, Header, ProgressBlock } from '@covid/components/Screen';
-import { BrandedButton, ErrorText, HeaderText, LabelText } from '@covid/components/Text';
-import { ValidatedTextInput } from '@covid/components/ValidatedTextInput';
-import { ValidationError, ValidationErrors } from '@covid/components/ValidationError';
-import { isUSCountry } from '@covid/core/user/UserService';
+import Screen, { Header, ProgressBlock } from '@covid/components/Screen';
+import { BrandedButton, ErrorText, HeaderText } from '@covid/components/Text';
+import { ValidationError } from '@covid/components/ValidationError';
+import { isUSCountry, ICoreService } from '@covid/core/user/UserService';
 import { PatientInfosRequest } from '@covid/core/user/dto/UserAPIContracts';
-import { cleanIntegerVal, cleanFloatVal } from '@covid/core/utils/number';
+import { cleanFloatVal, cleanIntegerVal } from '@covid/utils/number';
 import i18n from '@covid/locale/i18n';
-import { userService } from '@covid/Services';
+import patientCoordinator from '@covid/core/patient/PatientCoordinator';
+import YesNoField from '@covid/components/YesNoField';
+import { lazyInject } from '@covid/provider/services';
+import { Services } from '@covid/provider/services.types';
 
 import { ScreenParamList } from '../ScreenParamList';
 
@@ -82,13 +84,16 @@ const initialState: State = {
 };
 
 export default class AboutYouScreen extends Component<AboutYouProps, State> {
+  @lazyInject(Services.User)
+  private userService: ICoreService;
+
   constructor(props: AboutYouProps) {
     super(props);
     this.state = initialState;
   }
 
   async componentDidMount() {
-    const features = userService.getConfig();
+    const features = this.userService.getConfig();
 
     this.setState({
       showRaceQuestion: features.showRaceQuestion,
@@ -100,18 +105,18 @@ export default class AboutYouScreen extends Component<AboutYouProps, State> {
     if (this.state.enableSubmit) {
       this.setState({ enableSubmit: false }); // Stop resubmissions
 
-      const currentPatient = this.props.route.params.currentPatient;
+      const currentPatient = patientCoordinator.patientData.currentPatient;
       const patientId = currentPatient.patientId;
       var infos = this.createPatientInfos(formData);
 
-      userService
+      this.userService
         .updatePatient(patientId, infos)
         .then(() => {
           currentPatient.hasRaceEthnicityAnswer = formData.race.length > 0;
           currentPatient.isFemale = formData.sex !== 'male';
           currentPatient.isPeriodCapable =
             !['', 'male', 'pfnts'].includes(formData.sex) || !['', 'male', 'pfnts'].includes(formData.genderIdentity);
-          this.props.navigation.navigate('YourHealth', { currentPatient });
+          patientCoordinator.gotoNextScreen(this.props.route.name);
         })
         .catch(() => {
           this.setState({ errorMessage: i18n.t('something-went-wrong') });
@@ -254,7 +259,7 @@ export default class AboutYouScreen extends Component<AboutYouProps, State> {
   });
 
   render() {
-    const currentPatient = this.props.route.params.currentPatient;
+    const currentPatient = patientCoordinator.patientData.currentPatient;
     const sexAtBirthItems = [
       { label: i18n.t('choose-one-of-these-options'), value: '' },
       { label: i18n.t('sex-at-birth-male'), value: 'male' },
@@ -348,7 +353,7 @@ export default class AboutYouScreen extends Component<AboutYouProps, State> {
 
                 <HeightQuestion formikProps={props as FormikProps<HeightData>} />
 
-                <WeightQuestion formikProps={props as FormikProps<WeightData>} />
+                <WeightQuestion formikProps={props as FormikProps<WeightData>} label={i18n.t('your-weight')} />
 
                 <GenericTextField
                   formikProps={props}
@@ -367,25 +372,25 @@ export default class AboutYouScreen extends Component<AboutYouProps, State> {
                   error={props.touched.everExposed && props.errors.everExposed}
                 />
 
-                <DropdownField
+                <YesNoField
                   label={i18n.t('housebound-problems')}
                   selectedValue={props.values.houseboundProblems}
                   onValueChange={props.handleChange('houseboundProblems')}
                 />
 
-                <DropdownField
+                <YesNoField
                   label={i18n.t('needs-help')}
                   selectedValue={props.values.needsHelp}
                   onValueChange={props.handleChange('needsHelp')}
                 />
 
-                <DropdownField
+                <YesNoField
                   label={i18n.t('help-available')}
                   selectedValue={props.values.helpAvailable}
                   onValueChange={props.handleChange('helpAvailable')}
                 />
 
-                <DropdownField
+                <YesNoField
                   label={i18n.t('mobility-aid')}
                   selectedValue={props.values.mobilityAid}
                   onValueChange={props.handleChange('mobilityAid')}
@@ -393,7 +398,7 @@ export default class AboutYouScreen extends Component<AboutYouProps, State> {
 
                 <ErrorText>{this.state.errorMessage}</ErrorText>
                 {!!Object.keys(props.errors).length && props.submitCount > 0 && (
-                  <ValidationErrors errors={props.errors as string[]} />
+                  <ValidationError error={i18n.t('validation-error-text')} />
                 )}
 
                 <BrandedButton

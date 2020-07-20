@@ -2,38 +2,28 @@ import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { Formik, FormikProps } from 'formik';
 import moment from 'moment';
-import { Form, Item, Label, Text } from 'native-base';
+import { Form } from 'native-base';
 import React, { Component } from 'react';
 import * as Yup from 'yup';
 import { StyleSheet } from 'react-native';
 
 import { GenericTextField } from '@covid/components/GenericTextField';
 import ProgressStatus from '@covid/components/ProgressStatus';
-import Screen, { FieldWrapper, Header, ProgressBlock } from '@covid/components/Screen';
+import Screen, { Header, ProgressBlock } from '@covid/components/Screen';
 import { BrandedButton, ErrorText, HeaderText, RegularText } from '@covid/components/Text';
-import { ValidationError, ValidationErrors } from '@covid/components/ValidationError';
+import { ValidationError } from '@covid/components/ValidationError';
 import { AssessmentInfosRequest } from '@covid/core/assessment/dto/AssessmentInfosRequest';
 import { PatientStateType } from '@covid/core/patient/PatientState';
-import UserService from '@covid/core/user/UserService';
+import { ICoreService } from '@covid/core/user/UserService';
 import { PatientInfosRequest } from '@covid/core/user/dto/UserAPIContracts';
-import { cleanIntegerVal } from '@covid/core/utils/number';
-import AssessmentCoordinator from '@covid/features/assessment/AssessmentCoordinator';
+import { cleanIntegerVal } from '@covid/utils/number';
+import AssessmentCoordinator from '@covid/core/assessment/AssessmentCoordinator';
 import i18n from '@covid/locale/i18n';
 import { assessmentService } from '@covid/Services';
-import { CheckboxList } from '@covid/components/Checkbox';
-import {
-  SupplementValue,
-  supplementValues,
-  VitaminSupplementData,
-  VitaminSupplementsQuestion,
-} from '@covid/features/patient/fields/VitaminQuestion';
 import { colors, fontStyles } from '@theme';
 import { FaceMaskData, FaceMaskQuestion, TypeOfMaskValues } from '@covid/features/assessment/fields/FaceMaskQuestion';
-import { BloodPressureData } from '@covid/features/patient/fields/BloodPressureMedicationQuestion';
-import { RaceEthnicityData } from '@covid/features/patient/fields/RaceEthnicityQuestion';
-import { PeriodData } from '@covid/features/patient/fields/PeriodQuestion';
-import { HormoneTreatmentData } from '@covid/features/patient/fields/HormoneTreatmentQuestion';
-import { AtopyData } from '@covid/features/patient/fields/AtopyQuestions';
+import { Services } from '@covid/provider/services.types';
+import { lazyInject } from '@covid/provider/services';
 
 import { ScreenParamList } from '../ScreenParamList';
 
@@ -67,6 +57,9 @@ const initialState: State = {
 };
 
 export default class LevelOfIsolationScreen extends Component<LocationProps, State> {
+  @lazyInject(Services.User)
+  private userService: ICoreService;
+
   constructor(props: LocationProps) {
     super(props);
     this.state = initialState;
@@ -128,14 +121,13 @@ export default class LevelOfIsolationScreen extends Component<LocationProps, Sta
   });
 
   private updatePatientsLastAskedDate(currentPatient: PatientStateType) {
-    const userService = new UserService();
     const patientId = currentPatient.patientId;
     const timeNow = moment().toDate();
     const infos = {
       last_asked_level_of_isolation: timeNow,
     } as Partial<PatientInfosRequest>;
 
-    return userService
+    return this.userService
       .updatePatient(patientId, infos)
       .then(() => (currentPatient.shouldAskLevelOfIsolation = false))
       .catch(() => {
@@ -215,7 +207,7 @@ export default class LevelOfIsolationScreen extends Component<LocationProps, Sta
 
                 <ErrorText>{this.state.errorMessage}</ErrorText>
                 {!!Object.keys(props.errors).length && props.submitCount > 0 && (
-                  <ValidationErrors errors={props.errors as string[]} />
+                  <ValidationError error={i18n.t('validation-error-text')} />
                 )}
 
                 <BrandedButton

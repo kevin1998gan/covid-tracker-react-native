@@ -6,10 +6,9 @@ import { Linking, ScrollView, StyleSheet, View } from 'react-native';
 import { colors } from '@theme';
 import i18n from '@covid/locale/i18n';
 import { BrandedButton, ClickableText, RegularBoldText, RegularText } from '@covid/components/Text';
-import { ApplicationVersion } from '@covid/components/AppVersion';
 
 import { ScreenParamList } from '../../ScreenParamList';
-import { BulletedTextBlock, HeaderText, SimpleTextBlock } from '../LegalComponents';
+import { BulletedTextBlock, HeaderText, SimpleTextBlock } from '../../../components/LegalComponents';
 
 type PropsType = {
   navigation: StackNavigationProp<ScreenParamList, 'PrivacyPolicyUK'>;
@@ -203,8 +202,6 @@ export default class PrivacyPolicySVScreen extends Component<PropsType, object> 
             {i18n.t('legal.back')}
           </BrandedButton>
         )}
-
-        <ApplicationVersion />
       </View>
     );
   }

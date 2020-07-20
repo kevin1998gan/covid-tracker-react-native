@@ -1,16 +1,16 @@
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Form, Text } from 'native-base';
 import React, { Component } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { BigButton } from '@covid/components/BigButton';
 import ProgressStatus from '@covid/components/ProgressStatus';
-import Screen, { FieldWrapper, Header, ProgressBlock } from '@covid/components/Screen';
+import Screen, { Header, ProgressBlock } from '@covid/components/Screen';
 import { HeaderText } from '@covid/components/Text';
-import AssessmentCoordinator from '@covid/features/assessment/AssessmentCoordinator';
+import AssessmentCoordinator from '@covid/core/assessment/AssessmentCoordinator';
 import i18n from '@covid/locale/i18n';
 import { assessmentService } from '@covid/Services';
+import { USStudyInvite } from '@covid/components/USStudyInvite';
+import { SelectorButton } from '@covid/components/SelectorButton';
 
 import { ScreenParamList } from '../ScreenParamList';
 
@@ -31,7 +31,6 @@ export default class HowYouFeelScreen extends Component<HowYouFeelProps, State> 
   constructor(props: HowYouFeelProps) {
     super(props);
     this.state = initialState;
-    AssessmentCoordinator.resetNavigation(props.navigation);
   }
 
   handleFeelNormal = async () => {
@@ -73,39 +72,37 @@ export default class HowYouFeelScreen extends Component<HowYouFeelProps, State> 
   render() {
     const currentPatient = AssessmentCoordinator.assessmentData.currentPatient;
     return (
-      <Screen profile={currentPatient.profile} navigation={this.props.navigation}>
-        <Header>
-          <HeaderText>{i18n.t('how-you-feel.question-health-status')}</HeaderText>
-        </Header>
+      <>
+        <USStudyInvite assessmentData={AssessmentCoordinator.assessmentData} />
 
-        <ProgressBlock>
-          <ProgressStatus step={3} maxSteps={5} />
-        </ProgressBlock>
+        <Screen profile={currentPatient.profile} navigation={this.props.navigation}>
+          <Header>
+            <HeaderText>{i18n.t('how-you-feel.question-health-status')}</HeaderText>
+          </Header>
 
-        <Form style={styles.form}>
-          <FieldWrapper style={styles.fieldWrapper}>
-            <BigButton onPress={this.handleFeelNormal}>
-              <Text>{i18n.t('how-you-feel.picker-health-status-healthy')}</Text>
-            </BigButton>
-          </FieldWrapper>
+          <ProgressBlock>
+            <ProgressStatus step={3} maxSteps={5} />
+          </ProgressBlock>
 
-          <FieldWrapper style={styles.fieldWrapper}>
-            <BigButton onPress={this.handleHaveSymptoms}>
-              <Text>{i18n.t('how-you-feel.picker-health-status-not-healthy')}</Text>
-            </BigButton>
-          </FieldWrapper>
-        </Form>
-      </Screen>
+          <View style={styles.content}>
+            <SelectorButton
+              onPress={this.handleFeelNormal}
+              text={i18n.t('how-you-feel.picker-health-status-healthy')}
+            />
+
+            <SelectorButton
+              onPress={this.handleHaveSymptoms}
+              text={i18n.t('how-you-feel.picker-health-status-not-healthy')}
+            />
+          </View>
+        </Screen>
+      </>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  form: {
-    marginVertical: 32,
-  },
-
-  fieldWrapper: {
+  content: {
     marginVertical: 32,
   },
 });

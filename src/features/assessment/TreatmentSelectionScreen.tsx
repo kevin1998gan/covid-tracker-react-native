@@ -1,14 +1,14 @@
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { Form, Text } from 'native-base';
+import { Text } from 'native-base';
 import React, { Component } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { BigButton } from '@covid/components/BigButton';
 import ProgressStatus from '@covid/components/ProgressStatus';
 import Screen, { FieldWrapper, Header, ProgressBlock } from '@covid/components/Screen';
 import { CaptionText, HeaderText } from '@covid/components/Text';
-import AssessmentCoordinator from '@covid/features/assessment/AssessmentCoordinator';
+import AssessmentCoordinator from '@covid/core/assessment/AssessmentCoordinator';
 import i18n from '@covid/locale/i18n';
 import { assessmentService } from '@covid/Services';
 
@@ -20,11 +20,6 @@ type TreatmentSelectionProps = {
 };
 
 export default class TreatmentSelectionScreen extends Component<TreatmentSelectionProps> {
-  constructor(props: TreatmentSelectionProps) {
-    super(props);
-    AssessmentCoordinator.resetNavigation(props.navigation);
-  }
-
   handleTreatment = async (treatment: string) => {
     const { assessmentId } = AssessmentCoordinator.assessmentData;
     const { location } = this.props.route.params;
@@ -55,7 +50,7 @@ export default class TreatmentSelectionScreen extends Component<TreatmentSelecti
           <ProgressStatus step={4} maxSteps={5} />
         </ProgressBlock>
 
-        <Form style={styles.form}>
+        <View style={styles.content}>
           <FieldWrapper style={styles.fieldWrapper}>
             <BigButton onPress={() => this.handleTreatment('none')}>
               <Text>{i18n.t('treatment-selection-picker-none')}</Text>
@@ -92,15 +87,15 @@ export default class TreatmentSelectionScreen extends Component<TreatmentSelecti
               <Text>{i18n.t('treatment-selection-picker-other')}</Text>
             </BigButton>
           </FieldWrapper>
-        </Form>
+        </View>
       </Screen>
     );
   }
 }
 
 const styles = StyleSheet.create({
-  form: {
-    marginVertical: 24,
+  content: {
+    marginVertical: 36,
   },
 
   fieldWrapper: {

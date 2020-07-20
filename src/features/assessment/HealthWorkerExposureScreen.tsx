@@ -11,9 +11,10 @@ import ProgressStatus from '@covid/components/ProgressStatus';
 import Screen, { Header, isAndroid, ProgressBlock } from '@covid/components/Screen';
 import { BrandedButton, ErrorText, HeaderText } from '@covid/components/Text';
 import { AssessmentInfosRequest } from '@covid/core/assessment/dto/AssessmentInfosRequest';
-import AssessmentCoordinator from '@covid/features/assessment/AssessmentCoordinator';
+import AssessmentCoordinator from '@covid/core/assessment/AssessmentCoordinator';
 import i18n from '@covid/locale/i18n';
 import { assessmentService } from '@covid/Services';
+import YesNoField from '@covid/components/YesNoField';
 
 import { ScreenParamList } from '../ScreenParamList';
 
@@ -171,7 +172,7 @@ export default class HealthWorkerExposureScreen extends Component<HealthWorkerEx
             return (
               <Form>
                 <View>
-                  <DropdownField
+                  <YesNoField
                     selectedValue={props.values.interactedAnyPatients}
                     onValueChange={props.handleChange('interactedAnyPatients')}
                     label={i18n.t('health-worker-exposure-question-interacted-any-patients')}
@@ -223,7 +224,7 @@ export default class HealthWorkerExposureScreen extends Component<HealthWorkerEx
                   )}
                 </View>
 
-                {!!Object.keys(props.errors).length && <ErrorText>{i18n.t('validation-error-text-no-info')}</ErrorText>}
+                {!!Object.keys(props.errors).length && <ErrorText>{i18n.t('validation-error-text')}</ErrorText>}
                 <ErrorText>{this.state.errorMessage}</ErrorText>
 
                 <BrandedButton onPress={props.handleSubmit}>{i18n.t('next-question')}</BrandedButton>

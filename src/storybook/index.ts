@@ -5,12 +5,18 @@ import { CenterView } from '@covid/storybook/decorator';
 import './rn-addons';
 
 configure(() => {
-  require('./stories/AppVersion.stories');
   require('./stories/Badge.stories');
+  require('./stories/Buttons.stories');
   require('./stories/PoweredByZoe.stories');
   require('./stories/Spinner.stories');
   require('./stories/VisitWebsite.stories');
   require('./stories/DropdownField.stories');
+  require('./stories/DiabetesQuestions.stories');
+  require('./stories/YesNoField.stories');
+  require('./stories/ShareApp.stories');
+  require('./stories/Buttons.stories');
+  require('./stories/VaccineRegistryCallout.stories');
+  require('./stories/TextInput.stories');
 }, module);
 
 // Global Decorator

@@ -1,7 +1,8 @@
-import { PatientProfile, PatientStateType } from '@covid/core/patient/PatientState';
 import { CovidTest } from '@covid/core/user/dto/CovidTestContracts';
-import { AssessmentData } from '@covid/features/assessment/AssessmentCoordinator';
+import { AssessmentData } from '@covid/core/assessment/AssessmentCoordinator';
 import { Profile } from '@covid/features/multi-profile/SelectProfileScreen';
+import { PatientData } from '@covid/core/patient/PatientCoordinator';
+import { PatientStateType } from '@covid/core/patient/PatientState';
 
 export enum ConsentType {
   Adult = 'adult',
@@ -14,7 +15,7 @@ export type ScreenParamList = {
   // Welcome screens
   Welcome: undefined;
   Welcome2: undefined;
-  WelcomeRepeat: { patientId: string };
+  WelcomeRepeat: undefined;
 
   // Terms & consent screens
   Consent: { viewOnly: boolean };
@@ -31,9 +32,7 @@ export type ScreenParamList = {
   Register: undefined;
   Login: { terms: string };
   CountrySelect: { patientId: string | null };
-
-  // PII screens
-  OptionalInfo: { patientId: string };
+  OptionalInfo: undefined;
 
   // Profile screens
   ReportForOther: undefined;
@@ -45,16 +44,15 @@ export type ScreenParamList = {
   ArchiveReason: { profileId: string };
 
   // Patient screens
-  StartPatient: { currentPatient: PatientStateType };
-  YourStudy: { currentPatient: PatientStateType };
-  YourWork: { currentPatient: PatientStateType };
-  AboutYou: { currentPatient: PatientStateType };
-  YourHealth: { currentPatient: PatientStateType };
-  PreviousExposure: { currentPatient: PatientStateType };
+  YourStudy: { patientData: PatientData };
+  YourWork: { patientData: PatientData };
+  AboutYou: { patientData: PatientData };
+  YourHealth: { patientData: PatientData };
+  PreviousExposure: { patientData: PatientData };
 
   // Assessment screens
   HealthWorkerExposure: { assessmentData: AssessmentData };
-  CovidTest: { assessmentData: AssessmentData; tests?: CovidTest[] };
+  CovidTestList: { assessmentData: AssessmentData; tests?: CovidTest[] };
   CovidTestDetail: { assessmentData: AssessmentData; test?: CovidTest };
   HowYouFeel: { assessmentData: AssessmentData };
   DescribeSymptoms: { assessmentData: AssessmentData };
@@ -63,13 +61,17 @@ export type ScreenParamList = {
   TreatmentSelection: { assessmentData: AssessmentData; location: string };
   TreatmentOther: { assessmentData: AssessmentData; location: string };
   ProfileBackDate: { assessmentData: AssessmentData };
+  Lifestyle: { assessmentData: AssessmentData };
+
+  VaccineRegistrySignup: { currentPatient: PatientStateType };
+  VaccineRegistryInfo: { currentPatient: PatientStateType };
 
   // Completion screens
   ThankYou: undefined;
   ThankYouUK: undefined;
   ViralThankYou: undefined;
 
-  ValidationStudyIntro: { currentPatient: PatientStateType };
-  ValidationStudyInfo: { currentPatient?: PatientStateType };
-  ValidationStudyConsent: { viewOnly: boolean; currentPatient?: PatientStateType };
+  ValidationStudyIntro: undefined;
+  ValidationStudyInfo: undefined;
+  ValidationStudyConsent: { viewOnly: boolean };
 };

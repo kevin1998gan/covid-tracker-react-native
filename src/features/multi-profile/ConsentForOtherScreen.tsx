@@ -2,21 +2,20 @@ import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { ListItem } from 'native-base';
 import React, { Component } from 'react';
-import { StyleSheet } from 'react-native';
 
-import { colors } from '@theme';
 import { CheckboxItem } from '@covid/components/Checkbox';
 import { LoadingModal } from '@covid/components/Loading';
-import Screen, { Header, screenWidth } from '@covid/components/Screen';
+import Screen, { Header } from '@covid/components/Screen';
 import { BrandedButton, ClickableText, ErrorText, HeaderText, RegularText } from '@covid/components/Text';
-import { initialErrorState, ApiErrorState } from '@covid/core/api/ApiServiceErrors';
-import UserService from '@covid/core/user/UserService';
+import { ApiErrorState, initialErrorState } from '@covid/core/api/ApiServiceErrors';
+import { ICoreService } from '@covid/core/user/UserService';
 import { PatientInfosRequest } from '@covid/core/user/dto/UserAPIContracts';
-import AssessmentCoordinator from '@covid/features/assessment/AssessmentCoordinator';
 import i18n from '@covid/locale/i18n';
-import { userService, offlineService } from '@covid/Services';
+import { offlineService } from '@covid/Services';
+import { lazyInject } from '@covid/provider/services';
+import { Services } from '@covid/provider/services.types';
 
-import Navigator from '../Navigation';
+import appCoordinator from '../AppCoordinator';
 import { ConsentType, ScreenParamList } from '../ScreenParamList';
 
 type RenderProps = {
@@ -36,6 +35,9 @@ const initialState: ConsentState = {
 };
 
 export default class ConsentForOtherScreen extends Component<RenderProps, ConsentState> {
+  @lazyInject(Services.User)
+  private userService: ICoreService;
+
   constructor(props: RenderProps) {
     super(props);
     this.state = initialState;
@@ -47,7 +49,7 @@ export default class ConsentForOtherScreen extends Component<RenderProps, Consen
   };
 
   isAdultConsent = () => {
-    return this.props.route.params.consentType == ConsentType.Adult;
+    return this.props.route.params.consentType === ConsentType.Adult;
   };
 
   headerText = this.isAdultConsent() ? i18n.t('adult-consent-title') : i18n.t('child-consent-title');
@@ -70,12 +72,6 @@ export default class ConsentForOtherScreen extends Component<RenderProps, Consen
   );
   consentLabel = this.isAdultConsent() ? i18n.t('adult-consent-confirm') : i18n.t('child-consent-confirm');
 
-  async startAssessment(patientId: string) {
-    const userService = new UserService();
-    const currentPatient = await userService.getCurrentPatient(patientId);
-    Navigator.resetToProfileStartAssessment(currentPatient);
-  }
-
   async createProfile(): Promise<string> {
     const name = this.props.route.params.profileName;
     const avatarName = this.props.route.params.avatarName;
@@ -86,15 +82,15 @@ export default class ConsentForOtherScreen extends Component<RenderProps, Consen
       reported_by_another: true,
     } as Partial<PatientInfosRequest>;
 
-    const response = await userService.createPatient(newPatient);
-    const patientId = response.data.id;
-    return patientId;
+    const response = await this.userService.createPatient(newPatient);
+    return response.data.id;
   }
 
   handleCreateProfile = async () => {
     try {
       const patientId = await this.createProfile();
-      await this.startAssessment(patientId);
+      await appCoordinator.setPatientId(patientId);
+      appCoordinator.resetToProfileStartAssessment();
     } catch (error) {
       this.setState({ errorMessage: i18n.t('something-went-wrong') });
       this.setState({
@@ -145,43 +141,3 @@ export default class ConsentForOtherScreen extends Component<RenderProps, Consen
     );
   }
 }
-
-const styles = StyleSheet.create({
-  label: {
-    marginLeft: 10,
-  },
-
-  fieldRow: {
-    flexDirection: 'row',
-  },
-
-  primaryField: {
-    flex: 3,
-  },
-
-  secondaryField: {
-    flex: 1,
-  },
-
-  picker: {
-    width: screenWidth - 16,
-    marginTop: 16,
-  },
-
-  smallPicker: {
-    // width: 40,
-  },
-
-  textarea: {
-    width: '100%',
-  },
-
-  button: {
-    borderRadius: 8,
-    height: 56,
-    backgroundColor: colors.brand,
-  },
-  buttonText: {
-    color: colors.white,
-  },
-});
